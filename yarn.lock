@@ -348,6 +348,11 @@
   resolved "https://registry.yarnpkg.com/@types/scheduler/-/scheduler-0.16.2.tgz#1a62f89525723dde24ba1b01b092bf5df8ad4d39"
   integrity sha512-hppQEBDmlwhFAXKJX2KnWLYu5yMfi91yazPb2l+lbJiwW+wdo1gNeRA+3RgNSO39WYX2euey41KEwnqesU2Jew==
 
+"@types/three@^0.132.2":
+  version "0.132.2"
+  resolved "https://registry.yarnpkg.com/@types/three/-/three-0.132.2.tgz#80dad683a326e1eb7a87d388e10188b7beb41a18"
+  integrity sha512-DpaP0sObpHvKX8zdfCqyTK526N8lQ86Qstp6MnQJ3jNYie7Bv9AMRTALuoIH8dgVZ62z9twuNvEarWHXOZwmSw==
+
 "@typescript-eslint/parser@^4.20.0":
   version "4.32.0"
   resolved "https://registry.yarnpkg.com/@typescript-eslint/parser/-/parser-4.32.0.tgz#751ecca0e2fecd3d44484a9b3049ffc1871616e5"
@@ -3236,6 +3241,11 @@ text-table@^0.2.0:
   version "0.2.0"
   resolved "https://registry.yarnpkg.com/text-table/-/text-table-0.2.0.tgz#7f5ee823ae805207c00af2df4a84ec3fcfa570b4"
   integrity sha1-f17oI66AUgfACvLfSoTsP8+lcLQ=
+
+three@^0.133.0:
+  version "0.133.0"
+  resolved "https://registry.yarnpkg.com/three/-/three-0.133.0.tgz#41427306c731a89407221b7be48c7a63580400e7"
+  integrity sha512-1p8xTXnJD4hMM2Ktm7+FqOOBoImBoftKnKtAZT/b9AQeL3LhRkVu/HnIJhWA69qIMvUYpjfnunNsO4WdObw1ZQ==
 
 timers-browserify@2.0.12, timers-browserify@^2.0.4:
   version "2.0.12"
