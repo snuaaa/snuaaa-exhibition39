@@ -1,8 +1,9 @@
 const path = require('path');
 
+// console.log('hello eslint')
 module.exports = {
   root: true,
-  extends: ["airbnb", "airbnb-typescript", "eslint-config-next", "prettier"],
+  extends: ["airbnb", "airbnb-typescript", "eslint-config-next", "next/core-web-vitals"],
   parser: "@typescript-eslint/parser",
   parserOptions: {
     sourceType: "module",
@@ -23,7 +24,7 @@ module.exports = {
       "afterColon": true,
     }],
     "block-spacing": "error",
-    "space-in-brackets": ["error", "always"],
+    // object-curly-spacing, array-bracket-spacing, computed-property-spacin
     "linebreak-style": ["error", "unix"],
     "import/prefer-default-export": "off",
     "react/jsx-props-no-spreading": 0,
