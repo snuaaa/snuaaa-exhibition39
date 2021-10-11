@@ -13,9 +13,9 @@ class AaaControls {
         this.yawObject.add(this.pitchObject);
         this.raycaster = new THREE.Raycaster();
         this.wallObjects = objects
-    }    
-    
-    moveCamera (forward: number, right: number) {
+    }
+
+    moveCamera(forward: number, right: number) {
 
         const dx = forward * this.getCameraDirection().x - right * this.getCameraDirection().z;
         const dz = forward * this.getCameraDirection().z + right * this.getCameraDirection().x;
@@ -30,7 +30,7 @@ class AaaControls {
         }
     }
 
-    rotateCamera (dx: number, dy: number, dz: number) {
+    rotateCamera(dx: number, dy: number, dz: number) {
         this.yawObject.rotation.y -= dy;
         this.pitchObject.rotation.x += dx;
     }
@@ -42,6 +42,6 @@ class AaaControls {
         direction.applyEuler(roatation);
         return direction;
     }
-} 
+}
 
 export default AaaControls;

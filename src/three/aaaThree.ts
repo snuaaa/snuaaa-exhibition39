@@ -51,7 +51,7 @@ class AaaThree {
     this.shootingStarInterval = window.setInterval(() => {
       this.makeShootingStar();
     }, 400)
-    
+
     const width = document.body.clientWidth;
     const height = document.body.clientHeight;
 
@@ -65,15 +65,15 @@ class AaaThree {
 
     document.addEventListener('visibilitychange', () => {
       console.log(document.visibilityState)
-      if(document.visibilityState === 'hidden') {
+      if (document.visibilityState === 'hidden') {
         window.clearInterval(this.shootingStarInterval);
       } else {
         this.shootingStarInterval = window.setInterval(() => {
           this.makeShootingStar();
-        }, 500)        
+        }, 500)
       }
     })
-    
+
     targetElement.appendChild(this.stats.dom);
   }
 
@@ -85,10 +85,10 @@ class AaaThree {
 
     loader.load('/assets/models/tower_blended2.glb',
       (gltf) => {
-        const material = new THREE.MeshBasicMaterial({ map: texture});
+        const material = new THREE.MeshBasicMaterial({ map: texture });
         gltf.scene.traverse((child) => {
           // console.log(child)
-          if(child instanceof THREE.Mesh) {
+          if (child instanceof THREE.Mesh) {
             child.material = material;
           }
         })
@@ -113,10 +113,10 @@ class AaaThree {
         model.position.set(-1, -1, 3);
         model.rotateY(50 * Math.PI / 180)
 
-        this.scene.add( model );
-        const skeleton = new THREE.SkeletonHelper( model );
+        this.scene.add(model);
+        const skeleton = new THREE.SkeletonHelper(model);
         skeleton.visible = false;
-        this.scene.add( skeleton );
+        this.scene.add(skeleton);
       },
       (xhr) => {
         console.log(xhr);
@@ -200,17 +200,17 @@ class AaaThree {
     const pointLights = pointLightInfos.map((info) => {
       const pointLight = new THREE.PointLight(info.color, info.intensity, info.distance, 5);
       pointLight.position.set(info.position.x, info.position.y, info.position.z);
-      const sphere = new THREE.SphereGeometry( 0.05, 16, 16 );
+      const sphere = new THREE.SphereGeometry(0.05, 16, 16);
       const material = new THREE.MeshStandardMaterial({
         color: info.color,
         emissive: new THREE.Color(info.color),
       });
-      pointLight.add( new THREE.Mesh(sphere, material));
+      pointLight.add(new THREE.Mesh(sphere, material));
       const offSetIntensity = POINTLIGHT_INTENSITY / 2;
       setInterval((() => {
         let isBrightening = false;
         return () => {
-          if(pointLight.intensity > POINTLIGHT_INTENSITY) {
+          if (pointLight.intensity > POINTLIGHT_INTENSITY) {
             isBrightening = false;
           } else if (pointLight.intensity < offSetIntensity) {
             isBrightening = true;
@@ -229,12 +229,12 @@ class AaaThree {
     lights.push(...pointLights);
     return lights;
   }
-  
-  
+
+
   private makeWords() {
 
     opentype.load('/assets/fonts/FOUREYES.woff', (err, font) => {
-      if(err) {
+      if (err) {
         console.error(err);
       } else {
         const path = font?.getPath('동아리 소개', 0, 0, 1);
@@ -242,7 +242,7 @@ class AaaThree {
         path?.commands.forEach((command) => {
           switch (command.type) {
             case 'M':
-              threePath.moveTo(command.x, command.y);              
+              threePath.moveTo(command.x, command.y);
               break;
             case 'L':
               threePath.lineTo(command.x, command.y);
@@ -267,11 +267,11 @@ class AaaThree {
             side: THREE.DoubleSide,
           });
           const geometry = new THREE.ShapeGeometry(shape);
-          const object = new THREE.Mesh( geometry, material );
+          const object = new THREE.Mesh(geometry, material);
           object.scale.set(0.3, 0.3, 0.3);
           object.rotateX(Math.PI);
           object.position.set(-2.2, 0.7, 2.7);
-          this.scene.add( object );           
+          this.scene.add(object);
         })
       }
     });
@@ -282,7 +282,7 @@ class AaaThree {
     const height = document.body.clientHeight;
     this.camera.aspect = width / height;
 
-    if(width < 800) {
+    if (width < 800) {
       this.camera.fov = 70;
     } else {
       this.camera.fov = 50;
@@ -294,7 +294,7 @@ class AaaThree {
 
   private makeShootingStar() {
     const color = new THREE.Color('#FFFFFF');
-    const material = new THREE.MeshToonMaterial({color:color, side:THREE.DoubleSide});
+    const material = new THREE.MeshToonMaterial({ color: color, side: THREE.DoubleSide });
     const geometry = new THREE.ConeGeometry(0.03, 1 + this.makeRandom(0.3), 32);
     const shootingStar = new THREE.Mesh(geometry, material);
 
@@ -305,24 +305,24 @@ class AaaThree {
         shootingStar.position.z = (this.makeRandom(2) - 7);
       } else {
         isBack = true;
-        shootingStar.position.z = (this.makeRandom(2) - 5);    
+        shootingStar.position.z = (this.makeRandom(2) - 5);
       };
 
-      shootingStar.position.x = this.makeRandom(30);  
+      shootingStar.position.x = this.makeRandom(30);
       shootingStar.rotation.z = this.makeRandom(30) * Math.PI / 180;
       shootingStar.position.y = Math.abs(this.makeRandom(1)) + 10;
-      
+
       setInterval(() => {
-          if(shootingStar.position.y < 0) {
-            this.scene.remove(shootingStar);
-          } else {
-            shootingStar.position.x += SHOOTING_STAR_VELOCITY * Math.sin(shootingStar.rotation.z);
-            shootingStar.position.y -= SHOOTING_STAR_VELOCITY * Math.cos(shootingStar.rotation.z);
-            shootingStar.geometry.scale(1, 1.03, 1);
-          }
-        }, 50)
-  
-      this.scene.add(shootingStar);  
+        if (shootingStar.position.y < 0) {
+          this.scene.remove(shootingStar);
+        } else {
+          shootingStar.position.x += SHOOTING_STAR_VELOCITY * Math.sin(shootingStar.rotation.z);
+          shootingStar.position.y -= SHOOTING_STAR_VELOCITY * Math.cos(shootingStar.rotation.z);
+          shootingStar.geometry.scale(1, 1.03, 1);
+        }
+      }, 50)
+
+      this.scene.add(shootingStar);
     })();
   };
 
