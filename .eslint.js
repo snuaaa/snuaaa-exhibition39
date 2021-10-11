@@ -22,6 +22,8 @@ module.exports = {
       "beforeColon": false,
       "afterColon": true,
     }],
+    "block-spacing": "error",
+    "space-in-brackets": ["error", "always"],
     "linebreak-style": ["error", "unix"],
     "import/prefer-default-export": "off",
     "react/jsx-props-no-spreading": 0,
