@@ -6,8 +6,8 @@ import opentype from 'opentype.js';
 
 const HALL_SIZE_X = 100;
 const HALL_SIZE_Y = 100;
-const POINTLIGHT_INTENSITY = 7;
-const HEMISPHERELIGHT_INTENSITY = 0.8;
+const POINTLIGHT_INTENSITY = 3;
+const HEMISPHERELIGHT_INTENSITY = 0.4;
 const SHOOTING_STAR_VELOCITY = 0.3;
 
 class AaaThree {
@@ -27,20 +27,37 @@ class AaaThree {
   constructor() {
 
     const fov = window.innerWidth > 800 ? 50 : 70;
-    this.camera = new THREE.PerspectiveCamera(fov, window.innerWidth / window.innerHeight, 1, 200);
+    this.camera = new THREE.PerspectiveCamera(fov, window.innerWidth / window.innerHeight, 0.01, 200);
     this.camera.position.y = 2;
     this.camera.position.z = 13;
+
+    // MVP position
+    // this.camera.position.x = 0.36;
+    // this.camera.position.y = 5.7;
+    // this.camera.position.z = -0.69;
+    // this.camera.rotateX(34.7 * Math.PI / 180);
+    // this.camera.rotateY(17 * Math.PI / 180);
+    // this.camera.rotateZ(-11.3 * Math.PI / 180);
+    // this.camera.fov = 60;
+
     this.mouse = new THREE.Vector2();
   }
 
   public init(targetElement: HTMLDivElement) {
 
     this.scene.background = new THREE.Color('#101545');
-    this.scene.fog = new THREE.Fog(0x101545, 0, 25);
+    this.scene.fog = new THREE.Fog(0x101545, 15, 25);
 
     const floor = this.makeFloor();
 
-    this.makeTower();
+    this.makeTower('dome');
+    this.makeTower('door_guide');
+    this.makeTower('door_solar');
+    this.makeTower('door_star');
+    this.makeTower('door_trail');
+    this.makeTower('mvp');
+    this.makeTower('newbie_project');
+
     // this.makeCharacter();
     this.makeWords();
 
@@ -70,26 +87,28 @@ class AaaThree {
       } else {
         this.shootingStarInterval = window.setInterval(() => {
           this.makeShootingStar();
-        }, 500)
+        }, 2000)
       }
     })
 
     targetElement.appendChild(this.stats.dom);
   }
 
-  public makeTower() {
+  public makeTower(modelName: string) {
     const loader = new GLTFLoader();
-    const texture = new THREE.TextureLoader().load(`/assets/models/baked2.jpg`)
+    const texture = new THREE.TextureLoader().load(`/assets/models/${modelName}.jpg`)
     texture.flipY = false;
-    texture.encoding = THREE.sRGBEncoding;
+    // texture.encoding = THREE.sRGBEncoding;
 
-    loader.load('/assets/models/tower_blended2.glb',
+    loader.load(`/assets/models/${modelName}.glb`,
       (gltf) => {
         const material = new THREE.MeshBasicMaterial({ map: texture });
         gltf.scene.traverse((child) => {
-          // console.log(child)
           if (child instanceof THREE.Mesh) {
             child.material = material;
+            if (child.name.includes('link')) {
+
+            }
           }
         })
         const object = new THREE.Object3D();
@@ -206,23 +225,23 @@ class AaaThree {
         emissive: new THREE.Color(info.color),
       });
       pointLight.add(new THREE.Mesh(sphere, material));
-      const offSetIntensity = POINTLIGHT_INTENSITY / 2;
-      setInterval((() => {
-        let isBrightening = false;
-        return () => {
-          if (pointLight.intensity > POINTLIGHT_INTENSITY) {
-            isBrightening = false;
-          } else if (pointLight.intensity < offSetIntensity) {
-            isBrightening = true;
-          }
-          if (isBrightening) {
-            pointLight.intensity += 0.1;
-          } else {
-            pointLight.intensity -= 0.1;
-          }
+      // const offSetIntensity = POINTLIGHT_INTENSITY / 2;
+      // setInterval((() => {
+      //   let isBrightening = false;
+      //   return () => {
+      //     if (pointLight.intensity > POINTLIGHT_INTENSITY) {
+      //       isBrightening = false;
+      //     } else if (pointLight.intensity < offSetIntensity) {
+      //       isBrightening = true;
+      //     }
+      //     if (isBrightening) {
+      //       pointLight.intensity += 0.1;
+      //     } else {
+      //       pointLight.intensity -= 0.1;
+      //     }
 
-        }
-      })(), 50)
+      //   }
+      // })(), 50)
       return pointLight;
     })
 
@@ -262,16 +281,22 @@ class AaaThree {
         })
         const shapes = threePath.toShapes(true, false);
         shapes.forEach((shape) => {
-          const material = new THREE.MeshBasicMaterial({
-            color: 0xffffff,
+          const material = new THREE.MeshPhysicalMaterial({
+            color: 0xccccff,
             side: THREE.DoubleSide,
           });
+          material.blending = THREE.CustomBlending;
+          material.blendEquation = THREE.AddEquation;
+          material.blendSrc = THREE.SrcColorFactor;
+          material.blendDst = THREE.DstAlphaFactor;
           const geometry = new THREE.ShapeGeometry(shape);
           const object = new THREE.Mesh(geometry, material);
+          const object2 = new THREE.Mesh(geometry, material);
           object.scale.set(0.3, 0.3, 0.3);
           object.rotateX(Math.PI);
           object.position.set(-2.2, 0.7, 2.7);
           this.scene.add(object);
+          this.scene.add(object2);
         })
       }
     });
@@ -295,7 +320,7 @@ class AaaThree {
   private makeShootingStar() {
     const color = new THREE.Color('#FFFFFF');
     const material = new THREE.MeshToonMaterial({ color: color, side: THREE.DoubleSide });
-    const geometry = new THREE.ConeGeometry(0.03, 1 + this.makeRandom(0.3), 32);
+    const geometry = new THREE.ConeGeometry(0.03, 0.7 + this.makeRandom(0.3), 32);
     const shootingStar = new THREE.Mesh(geometry, material);
 
     let isBack = false;
@@ -309,8 +334,8 @@ class AaaThree {
       };
 
       shootingStar.position.x = this.makeRandom(30);
-      shootingStar.rotation.z = this.makeRandom(30) * Math.PI / 180;
       shootingStar.position.y = Math.abs(this.makeRandom(1)) + 10;
+      shootingStar.rotation.z = -(this.makeRandom(15) + 45) * Math.PI / 180;
 
       setInterval(() => {
         if (shootingStar.position.y < 0) {
