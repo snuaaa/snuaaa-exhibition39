@@ -32,6 +32,9 @@ const Home: NextPage = () => {
       const aaaThree = new AaaThree();
       aaaThree.init(ref);
       aaaThree.animate();
+      aaaThree.onClickLink = (name) => {
+        console.log(`[HOME] onClickLink ${name}`)
+      }
       // aaaThree.makeTower(towerModel)
     }
   }, []);

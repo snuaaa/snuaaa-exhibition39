@@ -14,15 +14,17 @@ class AaaThree {
 
   private scene = new THREE.Scene();
   private renderer = new THREE.WebGLRenderer({ antialias: true });
-  private photoObjects: THREE.Object3D[] = [];
 
   private camera: THREE.PerspectiveCamera;
 
   private mouse: THREE.Vector2;
   private controls?: OrbitControls;
   private stats = Stats();
+  private linkObject: THREE.Mesh[] = [];
 
   private shootingStarInterval: number = 0;
+
+  public onClickLink: (name: string) => void = () => { };
 
   constructor() {
 
@@ -81,7 +83,6 @@ class AaaThree {
     targetElement.addEventListener('mousemove', (e) => this.onMouseMove(e), false);
 
     document.addEventListener('visibilitychange', () => {
-      console.log(document.visibilityState)
       if (document.visibilityState === 'hidden') {
         window.clearInterval(this.shootingStarInterval);
       } else {
@@ -107,7 +108,16 @@ class AaaThree {
           if (child instanceof THREE.Mesh) {
             child.material = material;
             if (child.name.includes('link')) {
-
+              this.linkObject.push(child);
+              child.addEventListener('click', (e: THREE.Event) => {
+                this.onClickLink(child.name);
+              });
+              child.addEventListener('mouseon', () => {
+                document.body.style.cursor = 'pointer';
+              })
+              child.addEventListener('mouseout', () => {
+                document.body.style.cursor = 'default';
+              })
             }
           }
         })
@@ -117,7 +127,7 @@ class AaaThree {
         this.scene.add(object);
       },
       function (xhr) {
-        console.log(xhr);
+        // console.log(xhr);
       },
       function (err) {
         console.error(err);
@@ -138,7 +148,7 @@ class AaaThree {
         this.scene.add(skeleton);
       },
       (xhr) => {
-        console.log(xhr);
+        // console.log(xhr);
       },
       (err) => {
         console.error(err);
@@ -371,30 +381,26 @@ class AaaThree {
     const mouseRayCaster = new THREE.Raycaster();
 
     mouseRayCaster.setFromCamera(this.mouse, this.camera);
-    mouseRayCaster.far = 150;
-
-    let photos = this.photoObjects
-      .map(photoObject => photoObject.children
-        .filter(child => child.name.substring(0, 9) === 'photoMesh')[0])
+    mouseRayCaster.far = 20;
 
     const intersects = mouseRayCaster.intersectObjects(
-      photos
+      this.linkObject
     );
     if (intersects && intersects[0]) {
-      // let mesh = intersects[0].object as THREE.Mesh
-      if (intersects[0].object.name.substring(0, 9) === 'photoMesh') {
-        // THREE.find\
-        intersects[0].object.dispatchEvent({
+      const object = intersects[0].object;
+      if (object instanceof THREE.Mesh) {
+        console.log('mouseon');
+        object.dispatchEvent({
           type: "mouseon"
         })
       }
-    }
-    else {
-      photos.forEach((photo => {
-        photo.dispatchEvent({
-          type: "mouseout"
-        })
-      }))
+    } else {
+      // intersects[0].object
+      // photos.forEach((photo => {
+      //   photo.dispatchEvent({
+      //     type: "mouseout"
+      //   })
+      // }))
     }
   }
 };
