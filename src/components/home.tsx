@@ -1,12 +1,13 @@
 import type { NextPage } from 'next';
 import Image from 'next/image';
-import { useCallback } from 'react';
+import { useCallback, useState } from 'react';
 import { css } from '@emotion/css';
 
 import AaaThree from 'src/three/aaaThree';
 import slogan from 'public/assets/images/slogan.svg';
 import { smaller } from 'styles/animation';
 import Notice from './notice';
+import MVP from './mvp';
 
 const styles = {
   wrapper: css({
@@ -28,9 +29,14 @@ const styles = {
       width: '100%',
     },
   }),
+  canvas: css({
+    userSelect: 'none',
+  }),
 };
 
 const Home: NextPage = () => {
+  const [isMVP, setIsMVP] = useState(false);
+
   const canvasWrapper = useCallback((ref: HTMLDivElement) => {
     if (ref) {
       const aaaThree = new AaaThree();
@@ -38,17 +44,23 @@ const Home: NextPage = () => {
       aaaThree.animate();
       aaaThree.onClickLink = (name) => {
         console.log(`[HOME] onClickLink ${name}`);
+        if (name === 'link_mvp') {
+          setIsMVP(true);
+        }
       };
       // aaaThree.makeTower(towerModel)
     }
   }, []);
   return (
     <div className={styles.wrapper}>
-      <div ref={canvasWrapper} />
+      <div ref={canvasWrapper} className={styles.canvas} />
       <span className={styles.slogan}>
         <Image src={slogan} alt="for the STARved" />
       </span>
       <Notice />
+      {
+        isMVP && <MVP />
+      }
     </div>
   );
 };
