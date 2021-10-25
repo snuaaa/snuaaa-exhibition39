@@ -1,6 +1,8 @@
 import { useMemo } from 'react';
 import { css } from '@emotion/css';
 import { fadeIn } from 'styles/animation';
+import { SCENE } from 'src/recoils/scene';
+import useScene from 'src/hooks/useScene';
 
 const Login: React.FC = () => {
   const styles = useMemo(() => ({
@@ -53,6 +55,8 @@ const Login: React.FC = () => {
     }),
   }), []);
 
+  const { setScene } = useScene();
+
   return (
     <>
       <div className={styles.wrapper}>
@@ -72,7 +76,7 @@ const Login: React.FC = () => {
           수집된 개인정보는 사진전 전시와 이벤트가 모두 종료되는 2021.11.XX 이후로부터 N일 이내에 파기됩니다.
         </p>
         <button type="button" className={styles.loginButton}>로그인 하기</button>
-        <button type="button" className={styles.cancelButton}>뒤로가기</button>
+        <button type="button" className={styles.cancelButton} onClick={() => setScene(SCENE.HOME)}>뒤로가기</button>
       </div>
     </>
   );

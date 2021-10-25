@@ -1,11 +1,12 @@
 import type { NextPage } from 'next';
-import { useState } from 'react';
 import Head from 'next/head';
 import Home from 'src/components/home';
 import Intro from 'src/components/intro';
+import useScene from 'src/hooks/useScene';
+import { SCENE } from 'src/recoils/scene';
 
 const Index: NextPage = () => {
-  const [skipIntro, setSkipIntro] = useState<boolean>(false);
+  const { scene, setScene } = useScene();
 
   return (
     <>
@@ -15,10 +16,9 @@ const Index: NextPage = () => {
         <link rel="icon" href="/favicon.ico" />
       </Head>
       {
-        skipIntro
-          ? <Home />
-          : <Intro skip={() => setSkipIntro(true)} />
+        scene === SCENE.INTRO && <Intro skip={() => setScene(SCENE.HOME)} />
       }
+      <Home />
     </>
   );
 };

@@ -1,11 +1,13 @@
 import type { NextPage } from 'next';
 import Image from 'next/image';
-import { useCallback, useState } from 'react';
+import { useCallback, useEffect, useRef } from 'react';
 import { css } from '@emotion/css';
 
 import AaaThree from 'src/three/aaaThree';
 import slogan from 'public/assets/images/slogan.svg';
 import { smaller } from 'styles/animation';
+import useScene from 'src/hooks/useScene';
+import { SCENE } from 'src/recoils/scene';
 import Notice from './notice';
 import MVP from './mvp';
 
@@ -35,22 +37,29 @@ const styles = {
 };
 
 const Home: NextPage = () => {
-  const [isMVP, setIsMVP] = useState(false);
+  const { scene, setScene } = useScene();
+  const aaaThree = useRef<AaaThree>();
 
   const canvasWrapper = useCallback((ref: HTMLDivElement) => {
-    if (ref) {
-      const aaaThree = new AaaThree();
-      aaaThree.init(ref);
-      aaaThree.animate();
-      aaaThree.onClickLink = (name) => {
-        console.log(`[HOME] onClickLink ${name}`);
+    if (ref && !aaaThree.current) {
+      aaaThree.current = new AaaThree();
+      aaaThree.current.init(ref);
+      aaaThree.current.animate();
+      aaaThree.current.onClickLink = (name) => {
         if (name === 'link_mvp') {
-          setIsMVP(true);
+          setScene(SCENE.MVP);
         }
       };
       // aaaThree.makeTower(towerModel)
     }
-  }, []);
+  }, [setScene]);
+
+  useEffect(() => {
+    if (aaaThree.current) {
+      aaaThree.current.moveCamera(scene);
+    }
+  }, [scene, aaaThree]);
+
   return (
     <div className={styles.wrapper}>
       <div ref={canvasWrapper} className={styles.canvas} />
@@ -59,7 +68,7 @@ const Home: NextPage = () => {
       </span>
       <Notice />
       {
-        isMVP && <MVP />
+        scene === SCENE.MVP && <MVP />
       }
     </div>
   );

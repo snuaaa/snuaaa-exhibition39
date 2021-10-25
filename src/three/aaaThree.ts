@@ -3,6 +3,7 @@ import Stats from 'three/examples/jsm/libs/stats.module';
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
 import opentype from 'opentype.js';
+import { SCENE } from 'src/recoils/scene';
 
 const HALL_SIZE_X = 100;
 const HALL_SIZE_Y = 100;
@@ -107,6 +108,31 @@ class AaaThree {
     });
   }
 
+  public moveCamera(scene: SCENE) {
+    switch (scene) {
+      case SCENE.MVP:
+        this.camera.position.x = 0.36;
+        this.camera.position.y = 5.7;
+        this.camera.position.z = -0.69;
+        this.camera.rotation.x = 34.7 * Math.PI / 180;
+        this.camera.rotation.y = 17 * Math.PI / 180;
+        this.camera.rotation.z = -11.3 * Math.PI / 180;
+        this.camera.fov = window.innerWidth > 800 ? 60 : 60;
+        // this.camera.quaternion.slerp
+        break;
+      case SCENE.HOME:
+        this.camera.position.x = 0;
+        this.camera.position.y = 2;
+        this.camera.position.z = 13;    
+        this.camera.rotation.x = 0;
+        this.camera.rotation.y = 0;
+        this.camera.rotation.z = 0;
+        this.camera.fov = window.innerWidth > 800 ? 50 : 70;
+      default:
+        break;
+    }
+  }
+
   public makeTower(modelName: string) {
     const loader = new GLTFLoader();
     const texture = new THREE.TextureLoader().load(`/assets/models/${modelName}.jpg`)
@@ -132,20 +158,6 @@ class AaaThree {
 
               child.addEventListener('click', (e: THREE.Event) => {
                 console.log(`click ${child.name}`);
-                switch (child.name) {
-                  case 'link_mvp':
-                    this.camera.position.x = 0.36;
-                    this.camera.position.y = 5.7;
-                    this.camera.position.z = -0.69;
-                    this.camera.rotation.x = 34.7 * Math.PI / 180;
-                    this.camera.rotation.y = 17 * Math.PI / 180;
-                    this.camera.rotation.z = -11.3 * Math.PI / 180;
-                    this.camera.fov = 60;
-                    this.camera.quaternion.slerp
-                    break;
-                  default:
-                    break;
-                }
                 this.onClickLink(child.name);
               });
               child.addEventListener('mouseenter', () => {
