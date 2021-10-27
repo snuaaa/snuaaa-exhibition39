@@ -1,8 +1,10 @@
-import { useMemo } from 'react';
+import { useEffect, useMemo } from 'react';
 import { css } from '@emotion/css';
 import { fadeIn } from 'styles/animation';
 import { SCENE } from 'src/recoils/scene';
 import useScene from 'src/hooks/useScene';
+import Script from 'next/script';
+import { GOOGLE_CLIENT_ID } from 'src/config';
 
 const Login: React.FC = () => {
   const styles = useMemo(() => ({
@@ -28,19 +30,7 @@ const Login: React.FC = () => {
       animation: `${fadeIn} 1s`,
     }),
     loginButton: css({
-      border: '2px solid #FFFFFF',
-      borderRadius: '2rem',
-      padding: '0.5rem 1.5rem',
-      color: '#FFFFFF',
-      fontFamily: 'IM_Hyemin-Regular',
-      background: 'transparent',
       cursor: 'pointer',
-      transition: 'all ease 0.3s',
-      '&:hover': {
-        background: 'rgba(255, 255, 255, 0.2)',
-        // color: '#c874f2',
-        // borderColor: '#c874f2',
-      },
     }),
     cancelButton: css({
       position: 'absolute',
@@ -57,8 +47,49 @@ const Login: React.FC = () => {
 
   const { setScene } = useScene();
 
+  const onLoadGoogle = () => {
+    function handleCredentialResponse(response: any) {
+      console.log(`Encoded JWT ID token: ${response.credential}`);
+    }
+    const { google } = (window as any);
+    if (google) {
+      google.accounts.id.initialize({
+        client_id: GOOGLE_CLIENT_ID,
+        callback: handleCredentialResponse,
+      });
+      google.accounts.id.renderButton(
+        document.getElementById('loginButton'),
+        {
+          theme: 'outline',
+          size: 'smalll',
+        },
+      );
+      google.accounts.id.prompt(); // also display the One Tap dialog
+    }
+  };
+
+  const isGoogleLoaded = useMemo(() => !!(window as any).google, []);
+
+  useEffect(() => {
+    if (isGoogleLoaded) {
+      onLoadGoogle();
+    }
+  }, [isGoogleLoaded]);
+
   return (
     <>
+      {
+        !isGoogleLoaded && (
+          <Script
+            src="https://accounts.google.com/gsi/client"
+            async
+            defer
+            strategy="afterInteractive"
+            onLoad={onLoadGoogle}
+          />
+        )
+      }
+
       <div className={styles.wrapper}>
         <h5 className={styles.title}>투표를 위해서는 구글 로그인이 필요합니다. 로그인 하시겠습니까?</h5>
         <p className={styles.text}>
@@ -75,7 +106,7 @@ const Login: React.FC = () => {
           <br />
           수집된 개인정보는 사진전 전시와 이벤트가 모두 종료되는 2021.11.XX 이후로부터 N일 이내에 파기됩니다.
         </p>
-        <button type="button" className={styles.loginButton}>로그인 하기</button>
+        <div id="loginButton" className={styles.loginButton}>Login</div>
         <button type="button" className={styles.cancelButton} onClick={() => setScene(SCENE.HOME)}>뒤로가기</button>
       </div>
     </>
