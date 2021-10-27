@@ -1,6 +1,9 @@
-import { useEffect, useMemo, useState } from 'react';
+import {
+  useCallback, useEffect, useMemo, useState,
+} from 'react';
 import { css } from '@emotion/css';
 import { fadeIn } from 'styles/animation';
+import useAuth from 'src/hooks/useAuth';
 import Login from './login';
 
 const messages = [
@@ -43,6 +46,7 @@ const styles = {
 
 const MVP: React.FC = () => {
   const [index, setIndex] = useState<number>(0);
+  const { isLogin } = useAuth();
 
   useEffect(() => {
     const interval = window.setInterval(() => {
@@ -57,19 +61,25 @@ const MVP: React.FC = () => {
 
   const isMessageEnd = useMemo(() => (index === messages.length), [index]);
 
+  const makeView = useCallback(() => {
+    if (!isMessageEnd) {
+      return (
+        <p className={styles.text} key={index}>
+          {messages[index]}
+        </p>
+      );
+    }
+    if (!isLogin) {
+      return <Login />;
+    }
+    return <div>kkk</div>;
+  }, [index, isMessageEnd, isLogin]);
+
   return (
     <>
       <div className={styles.wrapper}>
         <div className={styles.textWrapper}>
-          {
-            isMessageEnd
-              ? <Login />
-              : (
-                <p className={styles.text} key={index}>
-                  {messages[index]}
-                </p>
-              )
-          }
+          {makeView()}
         </div>
       </div>
     </>

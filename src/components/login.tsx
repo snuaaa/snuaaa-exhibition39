@@ -1,10 +1,11 @@
-import { useEffect, useMemo } from 'react';
+import { useCallback, useEffect, useMemo } from 'react';
 import { css } from '@emotion/css';
 import { fadeIn } from 'styles/animation';
 import { SCENE } from 'src/recoils/scene';
 import useScene from 'src/hooks/useScene';
 import Script from 'next/script';
 import { GOOGLE_CLIENT_ID } from 'src/config';
+import useAuth from 'src/hooks/useAuth';
 
 const Login: React.FC = () => {
   const styles = useMemo(() => ({
@@ -46,10 +47,11 @@ const Login: React.FC = () => {
   }), []);
 
   const { setScene } = useScene();
+  const { setToken } = useAuth();
 
-  const onLoadGoogle = () => {
+  const onLoadGoogle = useCallback(() => {
     function handleCredentialResponse(response: any) {
-      console.log(`Encoded JWT ID token: ${response.credential}`);
+      setToken(response.credential);
     }
     const { google } = (window as any);
     if (google) {
@@ -66,7 +68,7 @@ const Login: React.FC = () => {
       );
       google.accounts.id.prompt(); // also display the One Tap dialog
     }
-  };
+  }, [setToken]);
 
   const isGoogleLoaded = useMemo(() => !!(window as any).google, []);
 
@@ -74,7 +76,7 @@ const Login: React.FC = () => {
     if (isGoogleLoaded) {
       onLoadGoogle();
     }
-  }, [isGoogleLoaded]);
+  }, [isGoogleLoaded, onLoadGoogle]);
 
   return (
     <>
