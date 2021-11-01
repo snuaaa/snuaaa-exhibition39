@@ -1,8 +1,9 @@
 import * as THREE from 'three';
-import Stats from 'three/examples/jsm/libs/stats.module.js';
+import Stats from 'three/examples/jsm/libs/stats.module';
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
 import opentype from 'opentype.js';
+import { SCENE } from 'src/recoils/scene';
 
 const HALL_SIZE_X = 100;
 const HALL_SIZE_Y = 100;
@@ -11,88 +12,125 @@ const HEMISPHERELIGHT_INTENSITY = 0.4;
 const SHOOTING_STAR_VELOCITY = 0.3;
 
 class AaaThree {
-
   private scene = new THREE.Scene();
+
   private renderer = new THREE.WebGLRenderer({ antialias: true });
 
   private camera: THREE.PerspectiveCamera;
 
   private mouse: THREE.Vector2;
+
   private controls?: OrbitControls;
+
   private stats = Stats();
-  private linkObject: THREE.Mesh[] = [];
+
+  private linkObjects: THREE.Mesh[] = [];
 
   private shootingStarInterval: number = 0;
+
+  private font?: opentype.Font;
 
   public onClickLink: (name: string) => void = () => { };
 
   constructor() {
-
     const fov = window.innerWidth > 800 ? 50 : 70;
-    this.camera = new THREE.PerspectiveCamera(fov, window.innerWidth / window.innerHeight, 0.01, 200);
+    this.camera = new THREE.PerspectiveCamera(
+      fov, window.innerWidth / window.innerHeight,
+      0.01,
+      200,
+    );
     this.camera.position.y = 2;
     this.camera.position.z = 13;
-
-    // MVP position
-    // this.camera.position.x = 0.36;
-    // this.camera.position.y = 5.7;
-    // this.camera.position.z = -0.69;
-    // this.camera.rotateX(34.7 * Math.PI / 180);
-    // this.camera.rotateY(17 * Math.PI / 180);
-    // this.camera.rotateZ(-11.3 * Math.PI / 180);
-    // this.camera.fov = 60;
 
     this.mouse = new THREE.Vector2();
   }
 
   public init(targetElement: HTMLDivElement) {
+    this.load()
+      .then(() => {
+        this.scene.background = new THREE.Color('#101545');
+        this.scene.fog = new THREE.Fog(0x101545, 15, 25);
+        const floor = this.makeFloor();
+        this.makeTower('dome');
+        this.makeTower('door_guide');
+        this.makeTower('door_solar');
+        this.makeTower('door_star');
+        this.makeTower('door_trail');
+        this.makeTower('mvp');
+        this.makeTower('newbie_project');
 
-    this.scene.background = new THREE.Color('#101545');
-    this.scene.fog = new THREE.Fog(0x101545, 15, 25);
+        // this.makeCharacter();
 
-    const floor = this.makeFloor();
+        this.scene.add(this.camera);
+        this.scene.add(...this.makeLights());
+        this.scene.add(floor);
 
-    this.makeTower('dome');
-    this.makeTower('door_guide');
-    this.makeTower('door_solar');
-    this.makeTower('door_star');
-    this.makeTower('door_trail');
-    this.makeTower('mvp');
-    this.makeTower('newbie_project');
-
-    // this.makeCharacter();
-    this.makeWords();
-
-    this.scene.add(this.camera);
-    this.scene.add(...this.makeLights());
-    this.scene.add(floor);
-
-    this.shootingStarInterval = window.setInterval(() => {
-      this.makeShootingStar();
-    }, 400)
-
-    const width = document.body.clientWidth;
-    const height = document.body.clientHeight;
-
-    this.renderer.shadowMap.enabled = true;
-    this.renderer.setPixelRatio(window.devicePixelRatio);
-    this.renderer.setSize(width, height);
-    targetElement.appendChild(this.renderer.domElement);
-
-    window.addEventListener('resize', this.onWindowResize.bind(this), false);
-    targetElement.addEventListener('mousemove', (e) => this.onMouseMove(e), false);
-
-    document.addEventListener('visibilitychange', () => {
-      if (document.visibilityState === 'hidden') {
-        window.clearInterval(this.shootingStarInterval);
-      } else {
         this.shootingStarInterval = window.setInterval(() => {
           this.makeShootingStar();
-        }, 2000)
-      }
-    })
+        }, 400);
 
-    targetElement.appendChild(this.stats.dom);
+        const width = document.body.clientWidth;
+        const height = document.body.clientHeight;
+
+        this.renderer.shadowMap.enabled = true;
+        this.renderer.setPixelRatio(window.devicePixelRatio);
+        this.renderer.setSize(width, height);
+        targetElement.appendChild(this.renderer.domElement);
+
+        window.addEventListener('resize', this.onWindowResize.bind(this), false);
+        targetElement.addEventListener('mousemove', (e) => this.onMouseMove(e), false);
+        targetElement.addEventListener('click', (e) => this.onMouseClick(e));
+
+        document.addEventListener('visibilitychange', () => {
+          if (document.visibilityState === 'hidden') {
+            window.clearInterval(this.shootingStarInterval);
+          } else {
+            this.shootingStarInterval = window.setInterval(() => {
+              this.makeShootingStar();
+            }, 2000);
+          }
+        });
+        targetElement.appendChild(this.stats.dom);
+      });
+  }
+
+  private load() {
+    return new Promise<void>((resolve, reject) => {
+      opentype.load('/assets/fonts/FOUREYES.woff', (err, font) => {
+        if (err) {
+          console.error(err);
+          reject();
+        } else {
+          this.font = font;
+          resolve();
+        }
+      });
+    });
+  }
+
+  public moveCamera(scene: SCENE) {
+    switch (scene) {
+      case SCENE.MVP:
+        this.camera.position.x = 0.36;
+        this.camera.position.y = 5.7;
+        this.camera.position.z = -0.69;
+        this.camera.rotation.x = 34.7 * Math.PI / 180;
+        this.camera.rotation.y = 17 * Math.PI / 180;
+        this.camera.rotation.z = -11.3 * Math.PI / 180;
+        this.camera.fov = window.innerWidth > 800 ? 60 : 60;
+        // this.camera.quaternion.slerp
+        break;
+      case SCENE.HOME:
+        this.camera.position.x = 0;
+        this.camera.position.y = 2;
+        this.camera.position.z = 13;    
+        this.camera.rotation.x = 0;
+        this.camera.rotation.y = 0;
+        this.camera.rotation.z = 0;
+        this.camera.fov = window.innerWidth > 800 ? 50 : 70;
+      default:
+        break;
+    }
   }
 
   public makeTower(modelName: string) {
@@ -103,19 +141,34 @@ class AaaThree {
 
     loader.load(`/assets/models/${modelName}.glb`,
       (gltf) => {
-        const material = new THREE.MeshBasicMaterial({ map: texture });
         gltf.scene.traverse((child) => {
+          const material = new THREE.MeshBasicMaterial({ map: texture });
           if (child instanceof THREE.Mesh) {
             child.material = material;
             if (child.name.includes('link')) {
-              this.linkObject.push(child);
+              this.linkObjects.push(child);
+
+              this.makeWords('hello', new THREE.Vector3(child.position.x, child.position.y, child.position.z));
+              // const sphere = new THREE.SphereGeometry(1, 16, 16);
+              // const material = new THREE.MeshStandardMaterial({
+              //   color: '#ffffff',
+              //   emissive: new THREE.Color('#ffffff'),
+              // });
+              // child.add(new THREE.Mesh(sphere, material));
+
               child.addEventListener('click', (e: THREE.Event) => {
+                console.log(`click ${child.name}`);
                 this.onClickLink(child.name);
               });
-              child.addEventListener('mouseon', () => {
+              child.addEventListener('mouseenter', () => {
+                console.log(`mouseenter ${child.name}`)
+                material.transparent = true;
+                material.opacity = 0.5;
                 document.body.style.cursor = 'pointer';
               })
               child.addEventListener('mouseout', () => {
+                console.log(`mouseout ${child.name}`)
+                material.transparent = false;
                 document.body.style.cursor = 'default';
               })
             }
@@ -260,56 +313,48 @@ class AaaThree {
   }
 
 
-  private makeWords() {
-
-    opentype.load('/assets/fonts/FOUREYES.woff', (err, font) => {
-      if (err) {
-        console.error(err);
-      } else {
-        const path = font?.getPath('동아리 소개', 0, 0, 1);
-        const threePath = new THREE.ShapePath();
-        path?.commands.forEach((command) => {
-          switch (command.type) {
-            case 'M':
-              threePath.moveTo(command.x, command.y);
-              break;
-            case 'L':
-              threePath.lineTo(command.x, command.y);
-              break;
-            case 'Q':
-              threePath.quadraticCurveTo(command.x1, command.y1, command.x, command.y);
-              break;
-            case 'C':
-              threePath.bezierCurveTo(command.x1, command.y1, command.x2, command.y2, command.x, command.y);
-              break;
-            case 'Z':
-              // threePath.closePath();
-              break;
-            default:
-              break;
-          }
-        })
-        const shapes = threePath.toShapes(true, false);
-        shapes.forEach((shape) => {
-          const material = new THREE.MeshPhysicalMaterial({
-            color: 0xccccff,
-            side: THREE.DoubleSide,
-          });
-          material.blending = THREE.CustomBlending;
-          material.blendEquation = THREE.AddEquation;
-          material.blendSrc = THREE.SrcColorFactor;
-          material.blendDst = THREE.DstAlphaFactor;
-          const geometry = new THREE.ShapeGeometry(shape);
-          const object = new THREE.Mesh(geometry, material);
-          const object2 = new THREE.Mesh(geometry, material);
-          object.scale.set(0.3, 0.3, 0.3);
-          object.rotateX(Math.PI);
-          object.position.set(-2.2, 0.7, 2.7);
-          this.scene.add(object);
-          this.scene.add(object2);
-        })
+  private makeWords(text: string, position: THREE.Vector3) {
+    const path = this.font?.getPath(text, 0, 0, 1);
+    const threePath = new THREE.ShapePath();
+    path?.commands.forEach((command) => {
+      switch (command.type) {
+        case 'M':
+          threePath.moveTo(command.x, command.y);
+          break;
+        case 'L':
+          threePath.lineTo(command.x, command.y);
+          break;
+        case 'Q':
+          threePath.quadraticCurveTo(command.x1, command.y1, command.x, command.y);
+          break;
+        case 'C':
+          threePath.bezierCurveTo(command.x1, command.y1, command.x2, command.y2, command.x, command.y);
+          break;
+        case 'Z':
+          // threePath.closePath();
+          break;
+        default:
+          break;
       }
-    });
+    })
+    const shapes = threePath.toShapes(true, false);
+    shapes.forEach((shape) => {
+      const material = new THREE.MeshPhysicalMaterial({
+        color: 0xccccff,
+        side: THREE.DoubleSide,
+      });
+      material.blending = THREE.CustomBlending;
+      material.blendEquation = THREE.AddEquation;
+      material.blendSrc = THREE.SrcColorFactor;
+      material.blendDst = THREE.DstAlphaFactor;
+      const geometry = new THREE.ShapeGeometry(shape);
+      const object = new THREE.Mesh(geometry, material);
+      object.scale.set(0.3, 0.3, 0.3);
+      object.rotateX(Math.PI);
+      object.position.set(position.x, position.y, position.z);
+      // object.position.set(-2.2, 0.7, 2.7);
+      this.scene.add(object);
+    })
   }
 
   private onWindowResize() {
@@ -324,7 +369,6 @@ class AaaThree {
     }
     this.camera.updateProjectionMatrix();
     this.renderer.setSize(width, height);
-    this.renderer.setSize
   }
 
   private makeShootingStar() {
@@ -355,7 +399,7 @@ class AaaThree {
           shootingStar.position.y -= SHOOTING_STAR_VELOCITY * Math.cos(shootingStar.rotation.z);
           shootingStar.geometry.scale(1, 1.03, 1);
         }
-      }, 50)
+      }, 50);
 
       this.scene.add(shootingStar);
     })();
@@ -373,36 +417,47 @@ class AaaThree {
     this.renderer.render(this.scene, this.camera);
   }
 
-
   private onMouseMove(event: MouseEvent) {
-
     this.mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
-    this.mouse.y = - (event.clientY / window.innerHeight) * 2 + 1;
-    const mouseRayCaster = new THREE.Raycaster();
+    this.mouse.y = (event.clientY / window.innerHeight) * -2 + 1;
 
+    const mouseRayCaster = new THREE.Raycaster();
     mouseRayCaster.setFromCamera(this.mouse, this.camera);
     mouseRayCaster.far = 20;
 
-    const intersects = mouseRayCaster.intersectObjects(
-      this.linkObject
-    );
-    if (intersects && intersects[0]) {
+    const intersects = mouseRayCaster.intersectObjects(this.linkObjects);
+    if (intersects && intersects[0] && intersects[0].object instanceof THREE.Mesh) {
       const object = intersects[0].object;
-      if (object instanceof THREE.Mesh) {
-        console.log('mouseon');
-        object.dispatchEvent({
-          type: "mouseon"
-        })
+        if (!object.userData.isMouseEnter) {
+          object.userData.isMouseEnter = true;
+          object.dispatchEvent({
+            type: 'mouseenter'
+          });
       }
     } else {
-      // intersects[0].object
-      // photos.forEach((photo => {
-      //   photo.dispatchEvent({
-      //     type: "mouseout"
-      //   })
-      // }))
+      const object = this.linkObjects.find((object) => object.userData.isMouseEnter)
+      if (object) {
+        object.userData.isMouseEnter = false;
+        object.dispatchEvent({
+          type: 'mouseout',
+        });
+      }
     }
   }
+
+  private onMouseClick(event: MouseEvent) {
+    const mouseRayCaster = new THREE.Raycaster();
+    mouseRayCaster.setFromCamera(this.mouse, this.camera);
+    mouseRayCaster.far = 20;
+
+    const intersects = mouseRayCaster.intersectObjects(this.linkObjects);
+    if (intersects && intersects[0] && intersects[0].object instanceof THREE.Mesh) {
+      const object = intersects[0].object;
+        object.dispatchEvent({
+          type: 'click',
+        });
+    }
+  };
 };
 
 export default AaaThree;
