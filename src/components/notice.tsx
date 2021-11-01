@@ -1,8 +1,7 @@
-import { useMemo, useState } from 'react';
-import Image from 'next/image';
+import React, { useMemo, useState } from 'react';
 import { css, cx } from '@emotion/css';
-import { fadeIn } from 'styles/animation';
-import star from 'public/assets/images/star.png';
+import { fadeIn } from 'src/styles/animation';
+import star from 'src/assets/images/star.png';
 
 const Notice: React.FC = () => {
   const [isOpened, setIsOpened] = useState<boolean>(true);
@@ -52,7 +51,7 @@ const Notice: React.FC = () => {
   return (
     <>
       <div className={cx([styles.wrapper])}>
-        <Image src={star} alt="star" width={30} height={30} />
+        <img src={star} alt="star" width={30} height={30} />
         <p className={styles.text}>
           전세계적 팬데믹은 많은 사람들을 불안과 혼란 속에 빠뜨렸습니다. 각 개인의 큰 노력과
           희생에도 불구하고 우리나라 또한 이 난국을 완전히 피해가지는 못했습니다.

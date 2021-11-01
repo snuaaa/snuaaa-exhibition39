@@ -1,9 +1,8 @@
-import { useCallback, useEffect, useMemo } from 'react';
+import React, { useCallback, useEffect, useMemo } from 'react';
 import { css } from '@emotion/css';
-import { fadeIn } from 'styles/animation';
+import { fadeIn } from 'src/styles/animation';
 import { SCENE } from 'src/recoils/scene';
 import useScene from 'src/hooks/useScene';
-import Script from 'next/script';
 import { GOOGLE_CLIENT_ID } from 'src/config';
 import useAuth from 'src/hooks/useAuth';
 
@@ -73,6 +72,19 @@ const Login: React.FC = () => {
   const isGoogleLoaded = useMemo(() => !!(window as any).google, []);
 
   useEffect(() => {
+    if (!isGoogleLoaded) {
+      const script = document.createElement('script');
+      script.src = 'https://accounts.google.com/gsi/client';
+      script.async = true;
+      script.defer = true;
+      script.onload = () => {
+        onLoadGoogle();
+      };
+      document.head.appendChild(script);
+    }
+  }, [isGoogleLoaded]);
+
+  useEffect(() => {
     if (isGoogleLoaded) {
       onLoadGoogle();
     }
@@ -80,17 +92,17 @@ const Login: React.FC = () => {
 
   return (
     <>
-      {
+      {/* {
         !isGoogleLoaded && (
           <Script
-            src="https://accounts.google.com/gsi/client"
+            src=""
             async
             defer
             strategy="afterInteractive"
             onLoad={onLoadGoogle}
           />
         )
-      }
+      } */}
 
       <div className={styles.wrapper}>
         <h5 className={styles.title}>투표를 위해서는 구글 로그인이 필요합니다. 로그인 하시겠습니까?</h5>

@@ -1,8 +1,8 @@
-import {
+import React, {
   useCallback, useEffect, useMemo, useState,
 } from 'react';
 import { css } from '@emotion/css';
-import { fadeIn } from 'styles/animation';
+import { fadeIn } from 'src/styles/animation';
 import useAuth from 'src/hooks/useAuth';
 import Login from './login';
 

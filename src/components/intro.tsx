@@ -1,11 +1,10 @@
-import { useEffect, useState } from 'react';
-import Image from 'next/image';
+import React, { useEffect, useState } from 'react';
 import { css, cx, keyframes } from '@emotion/css';
-import frameTop from 'public/assets/images/frame_top.png';
-import frameBottom from 'public/assets/images/frame_bottom.png';
-import character from 'public/assets/images/charactor.png';
-import spotlight from 'public/assets/images/spotlight.png';
-import thinking from 'public/assets/images/thinking.png';
+import frameTop from 'src/assets/images/frame_top.png';
+import frameBottom from 'src/assets/images/frame_bottom.png';
+import character from 'src/assets/images/charactor.png';
+import spotlight from 'src/assets/images/spotlight.png';
+import thinking from 'src/assets/images/thinking.png';
 
 const animation = {
   fadeIn: keyframes({
@@ -81,6 +80,7 @@ const styles = {
   spotlight: css({
     position: 'absolute',
     bottom: '0',
+    left: '-7.5rem',
     animation: `${animation.fadeInOut} 4s`,
     animationDelay: '2s',
     animationFillMode: 'both',
@@ -113,7 +113,7 @@ const Intro: React.FC<Props> = ({ skip }) => {
   useEffect(() => {
     let timeout: number = 0;
     const interval = window.setInterval(() => {
-      if (index < messages.length - 1) {
+      if (index < messages.length) {
         setIndex((idx) => idx + 1);
       } else {
         timeout = window.setTimeout(() => {
@@ -127,7 +127,7 @@ const Intro: React.FC<Props> = ({ skip }) => {
     };
   }, [index, skip]);
 
-  const isMessageEnd = index === messages.length - 1;
+  const isMessageEnd = index === messages.length;
 
   return (
     <>
@@ -136,27 +136,17 @@ const Intro: React.FC<Props> = ({ skip }) => {
           isMessageEnd
             ? (
               <div className={styles.characterWrapper}>
-                <span className={styles.character}>
-                  <Image src={character} alt="character" />
-                </span>
-                <span className={styles.spotlight}>
-                  <Image src={spotlight} alt="spotlight" />
-                </span>
-                <span className={styles.thinking}>
-                  <Image src={thinking} alt="thinking" />
-                </span>
+                <img className={styles.character} src={character} alt="character" />
+                <img className={styles.spotlight} src={spotlight} alt="spotlight" />
+                <img className={styles.thinking} src={thinking} alt="thinking" />
               </div>
             ) : (
               <>
-                <span className={cx([styles.frame])}>
-                  <Image src={frameTop} alt="frame" />
-                </span>
+                <img className={cx([styles.frame])} src={frameTop} alt="frame" />
                 <p className={styles.text} key={index}>
                   {messages[index]}
                 </p>
-                <span className={styles.frame}>
-                  <Image src={frameBottom} alt="frame" />
-                </span>
+                <img className={styles.frame} src={frameBottom} alt="frame" />
               </>
             )
         }

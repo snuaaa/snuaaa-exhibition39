@@ -1,11 +1,9 @@
-import type { NextPage } from 'next';
-import Image from 'next/image';
-import { useCallback, useEffect, useRef } from 'react';
+import React, { useCallback, useEffect, useRef } from 'react';
 import { css } from '@emotion/css';
 
 import AaaThree from 'src/three/aaaThree';
-import slogan from 'public/assets/images/slogan.svg';
-import { smaller } from 'styles/animation';
+import slogan from 'src/assets/images/slogan.svg';
+import { smaller } from 'src/styles/animation';
 import useScene from 'src/hooks/useScene';
 import { SCENE } from 'src/recoils/scene';
 import Notice from './notice';
@@ -15,6 +13,7 @@ const styles = {
   wrapper: css({
     position: 'relative',
     overflow: 'hidden',
+    height: '100%',
   }),
   slogan: css({
     position: 'absolute',
@@ -36,12 +35,16 @@ const styles = {
   }),
 };
 
-const Home: NextPage = () => {
+const Home: React.FC = () => {
   const { scene, setScene } = useScene();
   const aaaThree = useRef<AaaThree>();
 
   const canvasWrapper = useCallback((ref: HTMLDivElement) => {
+    console.log('hi');
+    console.log(ref);
+    console.log(aaaThree.current);
     if (ref && !aaaThree.current) {
+      console.log('here');
       aaaThree.current = new AaaThree();
       aaaThree.current.init(ref);
       aaaThree.current.animate();
@@ -63,9 +66,9 @@ const Home: NextPage = () => {
   return (
     <div className={styles.wrapper}>
       <div ref={canvasWrapper} className={styles.canvas} />
-      <span className={styles.slogan}>
-        <Image src={slogan} alt="for the STARved" />
-      </span>
+      {/* <span > */}
+      <img className={styles.slogan} src={slogan} alt="for the STARved" />
+      {/* </span> */}
       <Notice />
       {
         scene === SCENE.MVP && <MVP />
