@@ -4,7 +4,8 @@ import { fadeIn } from 'src/styles/animation';
 import { SCENE } from 'src/recoils/scene';
 import useScene from 'src/hooks/useScene';
 import { GOOGLE_CLIENT_ID } from 'src/config';
-import useAuth from 'src/hooks/useAuth';
+import useToken from 'src/hooks/useToken';
+import AuthService from 'src/services/authService';
 
 const Login: React.FC = () => {
   const styles = useMemo(() => ({
@@ -46,11 +47,12 @@ const Login: React.FC = () => {
   }), []);
 
   const { setScene } = useScene();
-  const { setToken } = useAuth();
+  const { setToken } = useToken();
 
   const onLoadGoogle = useCallback(() => {
     function handleCredentialResponse(response: any) {
       setToken(response.credential);
+      AuthService.authGoogle(response.credential);
     }
     const { google } = (window as any);
     if (google) {
@@ -92,18 +94,6 @@ const Login: React.FC = () => {
 
   return (
     <>
-      {/* {
-        !isGoogleLoaded && (
-          <Script
-            src=""
-            async
-            defer
-            strategy="afterInteractive"
-            onLoad={onLoadGoogle}
-          />
-        )
-      } */}
-
       <div className={styles.wrapper}>
         <h5 className={styles.title}>투표를 위해서는 구글 로그인이 필요합니다. 로그인 하시겠습니까?</h5>
         <p className={styles.text}>

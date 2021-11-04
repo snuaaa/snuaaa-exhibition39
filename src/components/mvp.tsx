@@ -1,10 +1,12 @@
 import React, {
+  Suspense,
   useCallback, useEffect, useMemo, useState,
 } from 'react';
 import { css } from '@emotion/css';
 import { fadeIn } from 'src/styles/animation';
-import useAuth from 'src/hooks/useAuth';
+import useToken from 'src/hooks/useToken';
 import Login from './login';
+import Vote from './vote';
 
 const messages = [
   '안녕하세요? 이곳은 MVP Zone입니다.',
@@ -46,7 +48,7 @@ const styles = {
 
 const MVP: React.FC = () => {
   const [index, setIndex] = useState<number>(0);
-  const { isLogin } = useAuth();
+  const { isLogin } = useToken();
 
   useEffect(() => {
     const interval = window.setInterval(() => {
@@ -72,7 +74,11 @@ const MVP: React.FC = () => {
     if (!isLogin) {
       return <Login />;
     }
-    return <div>kkk</div>;
+    return (
+      <Suspense fallback={<div>loading.....</div>}>
+        <Vote />
+      </Suspense>
+    );
   }, [index, isMessageEnd, isLogin]);
 
   return (
