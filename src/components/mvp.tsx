@@ -66,13 +66,19 @@ const MVP: React.FC = () => {
   const makeView = useCallback(() => {
     if (!isMessageEnd) {
       return (
-        <p className={styles.text} key={index}>
-          {messages[index]}
-        </p>
+        <div className={styles.textWrapper}>
+          <p className={styles.text} key={index}>
+            {messages[index]}
+          </p>
+        </div>
       );
     }
     if (!isLogin) {
-      return <Login />;
+      return (
+        <div className={styles.textWrapper}>
+          <Login />
+        </div>
+      );
     }
     return (
       <Suspense fallback={<div>loading.....</div>}>
@@ -84,9 +90,7 @@ const MVP: React.FC = () => {
   return (
     <>
       <div className={styles.wrapper}>
-        <div className={styles.textWrapper}>
-          {makeView()}
-        </div>
+        {makeView()}
       </div>
     </>
   );

@@ -1,6 +1,5 @@
 import axios from 'axios';
-
-const SERVER_URL = process.env.REACT_APP_API_SERVER_URL;
+import { SERVER_URL } from 'src/config';
 
 const getToken = () => window.localStorage.getItem('token');
 
