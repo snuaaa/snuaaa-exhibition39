@@ -8,11 +8,29 @@ import { SCENE } from 'src/recoils/scene';
 
 const HALL_SIZE_X = 100;
 const HALL_SIZE_Y = 100;
-const POINTLIGHT_INTENSITY = 3;
 const HEMISPHERELIGHT_INTENSITY = 0.4;
 const SHOOTING_STAR_VELOCITY = 0.3;
 
 const makeRandom = (scale: number = 1) => scale * (Math.random() - Math.random());
+
+const makeBreathing = (
+  mesh: THREE.Mesh, startScale: number, endScale: number, interval: number,
+) => {
+  const seg = (endScale - startScale) / (interval * 10);
+  window.setInterval((() => {
+    let scale = startScale + (endScale - startScale) * Math.random();
+    let direction = 1;
+    return () => {
+      if (scale > endScale) {
+        direction = -direction;
+      } else if (scale < startScale) {
+        direction = -direction;
+      }
+      scale += (seg * direction);
+      mesh.scale.set(scale, scale, scale);
+    };
+  })(), 100);
+};
 
 const makeFloor = () => {
   const floorGeometry = new THREE.PlaneBufferGeometry(HALL_SIZE_X, HALL_SIZE_Y);
@@ -41,80 +59,84 @@ const makeLights = () => {
   directionLight.position.set(600, 400, 200);
   lights.push(directionLight);
 
-  const pointLightInfos = [
-    // {
-    //   color: '#ff0000',
-    //   intensity: POINTLIGHT_INTENSITY,
-    //   distance: 10,
-    //   position: {
-    //     x: 0,
-    //     y: 3.5,
-    //     z: 0,
-    //   }
-    // },
-    {
-      color: '#f5dd00',
-      intensity: POINTLIGHT_INTENSITY,
-      distance: 10,
-      position: {
-        x: 0.2,
-        y: 0,
-        z: 3.5,
-      },
-    },
-    // {
-    //   color: '#eed800',
-    //   intensity: POINTLIGHT_INTENSITY,
-    //   distance: 10,
-    //   position: {
-    //     x: 2.7,
-    //     y: 1,
-    //     z: 2.5,
-    //   }
-    // },
-    // {
-    //   color: '#f5ff00',
-    //   intensity: POINTLIGHT_INTENSITY,
-    //   distance: 10,
-    //   position: {
-    //     x: 0.2,
-    //     y: 5.2,
-    //     z: 1.5,
-    //   }
-    // },
-  ];
-
-  const pointLights = pointLightInfos.map((info) => {
-    const pointLight = new THREE.PointLight(info.color, info.intensity, info.distance, 5);
-    pointLight.position.set(info.position.x, info.position.y, info.position.z);
-    const sphere = new THREE.SphereGeometry(0.05, 16, 16);
-    const material = new THREE.MeshStandardMaterial({
-      color: info.color,
-      emissive: new THREE.Color(info.color),
-    });
-    pointLight.add(new THREE.Mesh(sphere, material));
-    // const offSetIntensity = POINTLIGHT_INTENSITY / 2;
-    // setInterval((() => {
-    //   let isBrightening = false;
-    //   return () => {
-    //     if (pointLight.intensity > POINTLIGHT_INTENSITY) {
-    //       isBrightening = false;
-    //     } else if (pointLight.intensity < offSetIntensity) {
-    //       isBrightening = true;
-    //     }
-    //     if (isBrightening) {
-    //       pointLight.intensity += 0.1;
-    //     } else {
-    //       pointLight.intensity -= 0.1;
-    //     }
-
-    //   }
-    // })(), 50)
-    return pointLight;
-  });
-
-  lights.push(...pointLights);
   return lights;
+};
+
+const makeBreathingBall = (radius: number, position: THREE.Vector3) => {
+  const smallGeometry = new THREE.SphereGeometry(radius, 16, 16);
+  const material = new THREE.MeshBasicMaterial({ color: 0xffff00 });
+  material.transparent = true;
+  material.opacity = 0.3;
+
+  const smallBall = new THREE.Mesh(smallGeometry, material);
+  smallBall.position.set(position.x, position.y, position.z);
+
+  const middleGeometry = new THREE.SphereGeometry(radius, 16, 16);
+  const middleBall = new THREE.Mesh(middleGeometry, material);
+  middleBall.position.set(position.x, position.y, position.z);
+  makeBreathing(middleBall, 1.2, 1.8, 1);
+
+  const bigGeometry = new THREE.SphereGeometry(radius, 16, 16);
+  const bigBall = new THREE.Mesh(bigGeometry, material);
+  bigBall.position.set(position.x, position.y, position.z);
+  makeBreathing(bigBall, 1.5, 2.5, 1);
+
+  const ball = new THREE.Object3D();
+  ball.add(smallBall);
+  ball.add(middleBall);
+  ball.add(bigBall);
+
+  return ball;
+};
+
+const makeWords = (text: string, font: opentype.Font, position: THREE.Vector3) => {
+  const path = font.getPath(text, 0, 0, 1);
+  const threePath = new THREE.ShapePath();
+  path.commands.forEach((command) => {
+    switch (command.type) {
+      case 'M':
+        threePath.moveTo(command.x, command.y);
+        break;
+      case 'L':
+        threePath.lineTo(command.x, command.y);
+        break;
+      case 'Q':
+        threePath.quadraticCurveTo(command.x1, command.y1, command.x, command.y);
+        break;
+      case 'C':
+        threePath.bezierCurveTo(
+          command.x1, command.y1,
+          command.x2, command.y2,
+          command.x, command.y,
+        );
+        break;
+      case 'Z':
+        // threePath.closePath();
+        break;
+      default:
+        break;
+    }
+  });
+  const shapes = threePath.toShapes(true, false);
+  const object = new THREE.Object3D();
+  shapes.forEach((shape) => {
+    const material = new THREE.MeshPhysicalMaterial({
+      color: 0xccccff,
+      side: THREE.DoubleSide,
+    });
+    material.blending = THREE.CustomBlending;
+    material.blendEquation = THREE.AddEquation;
+    material.blendSrc = THREE.SrcColorFactor;
+    material.blendDst = THREE.DstAlphaFactor;
+    const geometry = new THREE.ShapeGeometry(shape);
+    const mesh = new THREE.Mesh(geometry, material);
+    mesh.scale.set(0.3, 0.3, 0.3);
+    mesh.rotateX(Math.PI);
+    mesh.position.set(position.x, position.y, position.z);
+    // object.position.set(-2.2, 0.7, 2.7);
+    object.add(mesh);
+  });
+  return object;
 };
 
 class AaaThree {
@@ -246,8 +268,9 @@ class AaaThree {
     texture.flipY = false;
     // texture.encoding = THREE.sRGBEncoding;
 
-    loader.load(`/assets/models/${modelName}.glb`,
+    loader.load(`/assets/models/${modelName}2.glb`,
       (gltf) => {
+        const object = new THREE.Object3D();
         gltf.scene.traverse((child) => {
           const material = new THREE.MeshBasicMaterial({ map: texture });
           if (child instanceof THREE.Mesh) {
@@ -255,7 +278,15 @@ class AaaThree {
             if (child.name.includes('link')) {
               this.linkObjects.push(child);
 
-              this.makeWords('hello', new THREE.Vector3(child.position.x, child.position.y, child.position.z));
+              if (this.font) {
+                const word = makeWords('hello', this.font, new THREE.Vector3(child.position.x, child.position.y + 0.2, child.position.z));
+                object.add(word);
+              }
+              const ball = makeBreathingBall(
+                0.05,
+                new THREE.Vector3(child.position.x, child.position.y, child.position.z),
+              );
+              object.add(ball);
               // const sphere = new THREE.SphereGeometry(1, 16, 16);
               // const material = new THREE.MeshStandardMaterial({
               //   color: '#ffffff',
@@ -264,30 +295,26 @@ class AaaThree {
               // child.add(new THREE.Mesh(sphere, material));
 
               child.addEventListener('click', () => {
-                console.log(`click ${child.name}`);
                 this.onClickLink(child.name);
               });
               child.addEventListener('mouseenter', () => {
-                console.log(`mouseenter ${child.name}`);
                 material.transparent = true;
                 material.opacity = 0.5;
                 document.body.style.cursor = 'pointer';
               });
               child.addEventListener('mouseout', () => {
-                console.log(`mouseout ${child.name}`);
                 material.transparent = false;
                 document.body.style.cursor = 'default';
               });
             }
           }
         });
-        const object = new THREE.Object3D();
         object.add(gltf.scene);
         object.rotateY(20 * (Math.PI / 180));
         this.scene.add(object);
       },
-      (xhr) => {
-        console.log(xhr);
+      () => {
+        // console.log(xhr);
       },
       (err) => {
         console.error(err);
@@ -307,60 +334,12 @@ class AaaThree {
         skeleton.visible = false;
         this.scene.add(skeleton);
       },
-      (xhr) => {
-        console.log(xhr);
+      () => {
+        // console.log(xhr);
       },
       (err) => {
         console.error(err);
       });
-  }
-
-  private makeWords(text: string, position: THREE.Vector3) {
-    const path = this.font?.getPath(text, 0, 0, 1);
-    const threePath = new THREE.ShapePath();
-    path?.commands.forEach((command) => {
-      switch (command.type) {
-        case 'M':
-          threePath.moveTo(command.x, command.y);
-          break;
-        case 'L':
-          threePath.lineTo(command.x, command.y);
-          break;
-        case 'Q':
-          threePath.quadraticCurveTo(command.x1, command.y1, command.x, command.y);
-          break;
-        case 'C':
-          threePath.bezierCurveTo(
-            command.x1, command.y1,
-            command.x2, command.y2,
-            command.x, command.y,
-          );
-          break;
-        case 'Z':
-          // threePath.closePath();
-          break;
-        default:
-          break;
-      }
-    });
-    const shapes = threePath.toShapes(true, false);
-    shapes.forEach((shape) => {
-      const material = new THREE.MeshPhysicalMaterial({
-        color: 0xccccff,
-        side: THREE.DoubleSide,
-      });
-      material.blending = THREE.CustomBlending;
-      material.blendEquation = THREE.AddEquation;
-      material.blendSrc = THREE.SrcColorFactor;
-      material.blendDst = THREE.DstAlphaFactor;
-      const geometry = new THREE.ShapeGeometry(shape);
-      const object = new THREE.Mesh(geometry, material);
-      object.scale.set(0.3, 0.3, 0.3);
-      object.rotateX(Math.PI);
-      object.position.set(position.x, position.y, position.z);
-      // object.position.set(-2.2, 0.7, 2.7);
-      this.scene.add(object);
-    });
   }
 
   private onWindowResize() {
