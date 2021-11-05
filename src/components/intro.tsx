@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { css, cx, keyframes } from '@emotion/css';
 import frameTop from 'src/assets/images/frame_top.png';
 import frameBottom from 'src/assets/images/frame_bottom.png';
@@ -94,6 +94,16 @@ const styles = {
     animationDelay: '3s',
     animationFillMode: 'both',
   }),
+  skip: css({
+    position: 'absolute',
+    bottom: '15rem',
+    color: '#FFFFFF',
+    fontFamily: 'IM_Hyemin-Regular',
+    fontSize: '1rem',
+    cursor: 'pointer',
+    background: 'none',
+    border: 'none',
+  }),
 };
 
 const messages = [
@@ -127,6 +137,10 @@ const Intro: React.FC<Props> = ({ skip }) => {
     };
   }, [index, skip]);
 
+  const onClickSkip = useCallback(() => {
+    skip();
+  }, [skip]);
+
   const isMessageEnd = index === messages.length;
 
   return (
@@ -147,6 +161,7 @@ const Intro: React.FC<Props> = ({ skip }) => {
                   {messages[index]}
                 </p>
                 <img className={styles.frame} src={frameBottom} alt="frame" />
+                <button type="button" className={styles.skip} onClick={onClickSkip}>SKIP &gt;&gt;</button>
               </>
             )
         }
