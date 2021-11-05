@@ -40,13 +40,27 @@ class AaaThree {
       0.01,
       200,
     );
-    this.camera.position.y = 2;
-    this.camera.position.z = 13;
+    this.camera.position.set(0, 2, 13);
 
     this.mouse = new THREE.Vector2();
   }
 
   public init(targetElement: HTMLDivElement) {
+    this.controls = new OrbitControls(this.camera, this.renderer.domElement);
+    // controls.listenToKeyEvents( window ); // optional
+
+    // an animation loop is required when either damping or auto-rotation are enabled
+    this.controls.enableDamping = true;
+    this.controls.dampingFactor = 0.05;
+
+    this.controls.screenSpacePanning = false;
+
+    this.controls.minDistance = 7;
+    this.controls.maxDistance = 15;
+
+    this.controls.maxPolarAngle = Math.PI / 2;
+    this.controls.target = new THREE.Vector3(0, 2, 0);
+
     this.load()
       .then(() => {
         this.scene.background = new THREE.Color('#101545');
