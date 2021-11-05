@@ -40,11 +40,7 @@ const Home: React.FC = () => {
   const aaaThree = useRef<AaaThree>();
 
   const canvasWrapper = useCallback((ref: HTMLDivElement) => {
-    console.log('hi');
-    console.log(ref);
-    console.log(aaaThree.current);
     if (ref && !aaaThree.current) {
-      console.log('here');
       aaaThree.current = new AaaThree();
       aaaThree.current.init(ref);
       aaaThree.current.animate();
