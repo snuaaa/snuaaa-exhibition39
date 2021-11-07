@@ -3,7 +3,7 @@ import { css, cx } from '@emotion/css';
 import { fadeIn } from 'src/styles/animation';
 import star from 'src/assets/images/star.png';
 
-const Notice: React.FC = () => {
+const WelcomeMessage: React.FC = () => {
   const [isOpened, setIsOpened] = useState<boolean>(true);
 
   const styles = useMemo(() => ({
@@ -78,4 +78,4 @@ const Notice: React.FC = () => {
   );
 };
 
-export default Notice;
+export default WelcomeMessage;

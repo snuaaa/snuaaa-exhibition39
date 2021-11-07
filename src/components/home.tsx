@@ -6,7 +6,7 @@ import slogan from 'src/assets/images/slogan.svg';
 import { smaller } from 'src/styles/animation';
 import useScene from 'src/hooks/useScene';
 import { SCENE } from 'src/recoils/scene';
-import Notice from './notice';
+import WelcomeMessage from './welcomeMessage';
 import MVP from './mvp';
 
 const styles = {
@@ -65,7 +65,7 @@ const Home: React.FC = () => {
       {/* <span > */}
       <img className={styles.slogan} src={slogan} alt="for the STARved" />
       {/* </span> */}
-      <Notice />
+      <WelcomeMessage />
       {
         scene === SCENE.MVP && <MVP />
       }
