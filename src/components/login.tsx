@@ -50,10 +50,10 @@ const Login: React.FC = () => {
   const { setToken } = useToken();
 
   const onLoadGoogle = useCallback(() => {
-    function handleCredentialResponse(response: any) {
-      setToken(response.credential);
-      AuthService.authGoogle(response.credential);
-    }
+    const handleCredentialResponse = async (response: any) => {
+      const authResponse = await AuthService.authGoogle(response.credential);
+      setToken(authResponse.token);
+    };
     const { google } = (window as any);
     if (google) {
       google.accounts.id.initialize({
@@ -84,7 +84,7 @@ const Login: React.FC = () => {
       };
       document.head.appendChild(script);
     }
-  }, [isGoogleLoaded]);
+  }, [isGoogleLoaded, onLoadGoogle]);
 
   useEffect(() => {
     if (isGoogleLoaded) {

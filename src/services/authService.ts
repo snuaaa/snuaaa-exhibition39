@@ -15,6 +15,10 @@ const AuthService = {
     return BaseService.post<AuthGoogleResponse>('auth/google', { token });
   },
 
+  authMember(password: string) {
+    return BaseService.post<GetInfoResponse>('auth/member', { password });
+  },
+
   checkToken() {
     return BaseService.get<string>('auth/check');
   },

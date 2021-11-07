@@ -1,11 +1,16 @@
 /* eslint-disable jsx-a11y/label-has-associated-control */
-import React from 'react';
+import React, {
+  ChangeEvent,
+  Fragment, useCallback, useMemo, useState,
+} from 'react';
 import { css } from '@emotion/css';
-// import { fadeIn } from 'src/styles/animation';
 import { useRecoilValue } from 'recoil';
 import photo from 'src/recoils/photoSelector';
 import { SERVER_URL } from 'src/config';
 import checker from 'src/assets/images/checker.png';
+import submitIcon from 'src/assets/icons/submit.svg';
+import cancelIcon from 'src/assets/icons/cancel.svg';
+import useAuth from 'src/hooks/useAuth';
 
 const styles = {
   wrapper: css({
@@ -46,7 +51,20 @@ const styles = {
   }),
   thumbnail: css({
     height: '8rem',
-    margin: '0.5rem',
+    cursor: 'pointer',
+  }),
+  selectedThumbnail: css({
+    borderColor: '#AC3A63',
+  }),
+  input: css({
+    display: 'none',
+    ':checked + label': {
+      borderColor: '#AC3A63',
+    },
+  }),
+  label: css({
+    border: '3px solid transparent',
+    margin: '0.2rem',
   }),
   memberCheck: css({
     zIndex: 1,
@@ -81,6 +99,27 @@ const styles = {
       content: '""',
     },
   }),
+  starRoomPassInput: css({
+    background: 'none',
+    border: 'none',
+    borderBottom: '2px solid #FFFFFF',
+    color: '#FFFFFF',
+    '&:focus-visible': {
+      outline: 'none',
+      borderColor: '#c874f2',
+    },
+  }),
+  iconButton: css({
+    background: 'none',
+    border: 'none',
+    height: '1.5rem',
+    width: '1.5rem',
+    position: 'relative',
+    cursor: 'pointer',
+  }),
+  icon: css({
+    height: '100%',
+  }),
   submitButton: css({
     marginTop: '1rem',
     width: '10rem',
@@ -101,34 +140,109 @@ const styles = {
 
 const Vote: React.FC = () => {
   const photoList = useRecoilValue(photo);
+  // const { isMember, hasVoted } = useRecoilValue(auth);
   const memberCheckerId = 'memberChecker';
+  const [selectedPhoto, setSelectedPhoto] = useState<number | null>(null);
+  const [memberChecker, setMemberChecker] = useState<boolean>(false);
+  const [password, setPassword] = useState<string>('');
+  const { auth: { isMember, hasVoted }, authMember } = useAuth();
+
+  const onClickPhoto = useCallback((photoId: number) => {
+    if (photoId === selectedPhoto) {
+      setSelectedPhoto(null);
+    } else {
+      setSelectedPhoto(photoId);
+    }
+  }, [selectedPhoto]);
+
+  const onClickMemberChecker = useCallback(() => {
+    setMemberChecker(true);
+  }, []);
+
+  const submitMemberChecker = useCallback(async () => {
+    authMember(password);
+  }, [authMember, password]);
+
+  const onChangePassword = useCallback((e: ChangeEvent<HTMLInputElement>) => {
+    setPassword(e.target.value);
+  }, []);
+
+  const isMemberChecking = useMemo(() => !isMember && memberChecker, [memberChecker, isMember]);
 
   return (
     <>
       <div className={styles.wrapper}>
-        <div className={styles.scrollAreaWrapper}>
-          <div className={styles.scrollArea}>
-            {
-              photoList.map((_photo) => (
-                <img
-                  className={styles.thumbnail}
-                  src={`${SERVER_URL}/static/${_photo.thumbnail_path}`}
-                  alt={`thumbnail_${_photo.photo_id}`}
-                  key={`thumbnail_${_photo.photo_id}`}
-                />
-              ))
-            }
-          </div>
-        </div>
-        <div className={styles.memberCheck}>
-          <input id={memberCheckerId} type="checkbox" className={styles.memberCheckInput} />
-          <label htmlFor={memberCheckerId} className={styles.memberCheckLabel}>
-            나는 AAA회원입니다.
-          </label>
-        </div>
-        <button type="button" className={styles.submitButton}>
-          투표하기
-        </button>
+        {
+          hasVoted
+            ? <div>투표에 참여해주셔서 감사합니다 ㅎ</div>
+            : (
+              <>
+                <div className={styles.scrollAreaWrapper}>
+                  <div className={styles.scrollArea}>
+                    {
+                      photoList.map((_photo) => {
+                        const photoId = `photo${_photo.photo_id}`;
+                        return (
+                          <Fragment key={`thumbnail_${_photo.photo_id}`}>
+                            <input
+                              type="radio"
+                              name="mvpPhoto"
+                              id={photoId}
+                              className={styles.input}
+                              checked={selectedPhoto === _photo.photo_id}
+                              onChange={() => onClickPhoto(_photo.photo_id)}
+                            />
+                            <label
+                              htmlFor={photoId}
+                              className={styles.label}
+                            >
+                              <img
+                                className={styles.thumbnail}
+                                src={`${SERVER_URL}/static/${_photo.thumbnail_path}`}
+                                alt={`thumbnail_${_photo.photo_id}`}
+                              />
+                            </label>
+                          </Fragment>
+                        );
+                      })
+                    }
+                  </div>
+                </div>
+                {
+                  isMemberChecking
+                    ? (
+                      <div className={styles.memberCheck}>
+                        <p>별방 비밀번호는 무엇일까요?</p>
+                        <div>
+                          <input type="number" className={styles.starRoomPassInput} value={password} onChange={onChangePassword} />
+                          <button type="button" className={styles.iconButton} onClick={submitMemberChecker}>
+                            <img src={submitIcon} alt="submitIcon" className={styles.icon} />
+                          </button>
+                          <button type="button" className={styles.iconButton} onClick={() => setMemberChecker(false)}>
+                            <img src={cancelIcon} alt="cancelIcon" className={styles.icon} />
+                          </button>
+                        </div>
+                      </div>
+                    )
+                    : (
+                      <>
+                        <div className={styles.memberCheck}>
+                          <input id={memberCheckerId} type="checkbox" className={styles.memberCheckInput} checked={isMember} onChange={onClickMemberChecker} />
+                          <label htmlFor={memberCheckerId} className={styles.memberCheckLabel}>
+                            나는 AAA회원입니다.
+                          </label>
+                        </div>
+                        <button type="button" className={styles.submitButton}>
+                          투표하기
+                        </button>
+                      </>
+
+                    )
+                }
+              </>
+            )
+        }
+
       </div>
     </>
   );
