@@ -2,7 +2,7 @@ const path = require('path');
 
 module.exports = {
   root: true,
-  extends: ["airbnb", "airbnb-typescript"],
+  extends: ["airbnb", "airbnb-typescript", "react-app"],
   parser: "@typescript-eslint/parser",
   parserOptions: {
     sourceType: "module",
