@@ -1,6 +1,6 @@
 import * as THREE from 'three';
 import Stats from 'three/examples/jsm/libs/stats.module';
-import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader';
+import { GLTF, GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
 import opentype from 'opentype.js';
 import { SCENE } from 'src/recoils/scene';
@@ -11,6 +11,21 @@ import {
 import { LinkName, mapName } from './constants';
 
 const SHOOTING_STAR_VELOCITY = 0.3;
+const MODELS_TOWER = [
+  'dome',
+  'door_guide',
+  'door_solar',
+  'door_star',
+  'door_trail',
+  'mvp',
+  'newbie_project',
+];
+
+interface ModelSet {
+  gltf: GLTF,
+  texture: THREE.Texture,
+  name: string,
+}
 
 class AaaThree {
   private scene = new THREE.Scene();
@@ -32,6 +47,8 @@ class AaaThree {
   private font?: opentype.Font;
 
   public onClickLink: (name: string) => void = () => { };
+
+  public towerModels: ModelSet[] = [];
 
   constructor() {
     const fov = window.innerWidth > 800 ? 50 : 70;
@@ -66,15 +83,7 @@ class AaaThree {
         this.scene.background = new THREE.Color('#101545');
         this.scene.fog = new THREE.Fog(0x101545, 15, 25);
         const floor = makeFloor();
-        this.makeTower('dome');
-        this.makeTower('door_guide');
-        this.makeTower('door_solar');
-        this.makeTower('door_star');
-        this.makeTower('door_trail');
-        this.makeTower('mvp');
-        this.makeTower('newbie_project');
-
-        // this.makeCharacter();
+        this.makeTower();
 
         this.scene.add(this.camera);
         this.scene.add(...makeLights());
@@ -109,7 +118,12 @@ class AaaThree {
       });
   }
 
-  private load() {
+  private async load() {
+    await this.loadFont();
+    await Promise.all(MODELS_TOWER.map((modelName) => this.loadTower(modelName)));
+  }
+
+  private loadFont() {
     return new Promise<void>((resolve, reject) => {
       opentype.load(`${APP_URL}assets/fonts/FOUREYES.woff`, (err, font) => {
         if (err) {
@@ -119,6 +133,32 @@ class AaaThree {
           resolve();
         }
       });
+    });
+  }
+
+  private loadTower(modelName: string) {
+    const loader = new GLTFLoader();
+    const texture = new THREE.TextureLoader().load(`/assets/models/${modelName}.jpg`);
+    texture.flipY = false;
+    // texture.encoding = THREE.sRGBEncoding;
+
+    return new Promise<void>((resolve, reject) => {
+      loader.load(`/assets/models/${modelName}.glb`,
+        (gltf) => {
+          this.towerModels.push({
+            gltf,
+            texture,
+            name: modelName,
+          });
+          resolve();
+        },
+        () => {
+          // console.log(xhr);
+        },
+        (err) => {
+          console.error(err);
+          reject(err);
+        });
     });
   }
 
@@ -148,64 +188,55 @@ class AaaThree {
     }
   }
 
-  public makeTower(modelName: string) {
-    const loader = new GLTFLoader();
-    const texture = new THREE.TextureLoader().load(`/assets/models/${modelName}.jpg`);
-    texture.flipY = false;
-    // texture.encoding = THREE.sRGBEncoding;
+  public makeTower() {
+    this.towerModels.forEach(({
+      gltf,
+      texture,
+    }) => {
+      const object = new THREE.Object3D();
+      gltf.scene.traverse((child) => {
+        const material = new THREE.MeshBasicMaterial({ map: texture });
+        if (child instanceof THREE.Mesh) {
+          child.material = material;
+          if (child.name.includes('link') && this.font) {
+            this.linkObjects.push(child);
+            const linkName = mapName(child.name as LinkName);
+            const word = makeWords(
+              linkName,
+              this.font,
+              new THREE.Vector3(child.position.x, child.position.y + 0.2, child.position.z),
+            );
+            object.add(word);
+            word.visible = false;
 
-    loader.load(`/assets/models/${modelName}.glb`,
-      (gltf) => {
-        const object = new THREE.Object3D();
-        gltf.scene.traverse((child) => {
-          const material = new THREE.MeshBasicMaterial({ map: texture });
-          if (child instanceof THREE.Mesh) {
-            child.material = material;
-            if (child.name.includes('link') && this.font) {
-              this.linkObjects.push(child);
-              const linkName = mapName(child.name as LinkName);
-              const word = makeWords(
-                linkName,
-                this.font,
-                new THREE.Vector3(child.position.x, child.position.y + 0.2, child.position.z),
-              );
-              object.add(word);
-              word.visible = false;
-
-              const ball = makeBreathingBall(
-                0.05,
-                new THREE.Vector3(child.position.x, child.position.y, child.position.z),
-              );
-              object.add(ball);
-              ball.traverse((mesh) => {
-                if (mesh instanceof THREE.Mesh) {
-                  this.linkObjects.push(mesh);
-                  mesh.addEventListener('click', () => {
-                    this.onClickLink(child.name);
-                  });
-                  mesh.addEventListener('mouseenter', () => {
-                    document.body.style.cursor = 'pointer';
-                    word.visible = true;
-                  });
-                  mesh.addEventListener('mouseout', () => {
-                    word.visible = false;
-                    document.body.style.cursor = 'default';
-                  });
-                }
-              });
-            }
+            const ball = makeBreathingBall(
+              0.05,
+              new THREE.Vector3(child.position.x, child.position.y, child.position.z),
+            );
+            object.add(ball);
+            ball.traverse((mesh) => {
+              if (mesh instanceof THREE.Mesh) {
+                this.linkObjects.push(mesh);
+                mesh.addEventListener('click', () => {
+                  this.onClickLink(child.name);
+                });
+                mesh.addEventListener('mouseenter', () => {
+                  document.body.style.cursor = 'pointer';
+                  word.visible = true;
+                });
+                mesh.addEventListener('mouseout', () => {
+                  word.visible = false;
+                  document.body.style.cursor = 'default';
+                });
+              }
+            });
           }
-        });
-        object.add(gltf.scene);
-        object.rotateY(20 * (Math.PI / 180));
-        this.scene.add(object);
-      },
-      () => {
-        // console.log(xhr);
-      },
-      (err) => {
-        console.error(err);
+        }
       });
+      object.add(gltf.scene);
+      object.rotateY(20 * (Math.PI / 180));
+      this.scene.add(object);
+    });
   }
 
   private onWindowResize() {
