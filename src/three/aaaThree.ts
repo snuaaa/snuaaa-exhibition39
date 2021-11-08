@@ -208,27 +208,6 @@ class AaaThree {
       });
   }
 
-  public makeCharacter() {
-    const loader = new GLTFLoader();
-    loader.load('/assets/models/Xbot.glb',
-      (gltf) => {
-        const model = gltf.scene;
-        model.position.set(-1, -1, 3);
-        model.rotateY(50 * (Math.PI / 180));
-
-        this.scene.add(model);
-        const skeleton = new THREE.SkeletonHelper(model);
-        skeleton.visible = false;
-        this.scene.add(skeleton);
-      },
-      () => {
-        // console.log(xhr);
-      },
-      (err) => {
-        console.error(err);
-      });
-  }
-
   private onWindowResize() {
     const width = document.body.clientWidth;
     const height = document.body.clientHeight;
