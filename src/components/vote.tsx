@@ -11,6 +11,7 @@ import checker from 'src/assets/images/checker.png';
 import submitIcon from 'src/assets/icons/submit.svg';
 import cancelIcon from 'src/assets/icons/cancel.svg';
 import useAuth from 'src/hooks/useAuth';
+import PhotoService from 'src/services/photoService';
 
 const styles = {
   wrapper: css({
@@ -140,12 +141,12 @@ const styles = {
 
 const Vote: React.FC = () => {
   const photoList = useRecoilValue(photo);
-  // const { isMember, hasVoted } = useRecoilValue(auth);
   const memberCheckerId = 'memberChecker';
   const [selectedPhoto, setSelectedPhoto] = useState<number | null>(null);
   const [memberChecker, setMemberChecker] = useState<boolean>(false);
   const [password, setPassword] = useState<string>('');
-  const { auth: { isMember, hasVoted }, authMember } = useAuth();
+  const { auth, setAuth, authMember } = useAuth();
+  const { isMember } = auth;
 
   const onClickPhoto = useCallback((photoId: number) => {
     if (photoId === selectedPhoto) {
@@ -167,82 +168,84 @@ const Vote: React.FC = () => {
     setPassword(e.target.value);
   }, []);
 
+  const submit = useCallback(() => {
+    if (selectedPhoto) {
+      PhotoService.vote(selectedPhoto)
+        .then(() => {
+          setAuth({
+            ...auth,
+            hasVoted: true,
+          });
+        });
+    }
+  }, [selectedPhoto, auth, setAuth]);
+
   const isMemberChecking = useMemo(() => !isMember && memberChecker, [memberChecker, isMember]);
 
   return (
     <>
       <div className={styles.wrapper}>
+        <div className={styles.scrollAreaWrapper}>
+          <div className={styles.scrollArea}>
+            {
+              photoList.map((_photo) => {
+                const photoId = `photo${_photo.photo_id}`;
+                return (
+                  <Fragment key={`thumbnail_${_photo.photo_id}`}>
+                    <input
+                      type="radio"
+                      name="mvpPhoto"
+                      id={photoId}
+                      className={styles.input}
+                      checked={selectedPhoto === _photo.photo_id}
+                      onChange={() => onClickPhoto(_photo.photo_id)}
+                    />
+                    <label
+                      htmlFor={photoId}
+                      className={styles.label}
+                    >
+                      <img
+                        className={styles.thumbnail}
+                        src={`${SERVER_URL}/static/${_photo.thumbnail_path}`}
+                        alt={`thumbnail_${_photo.photo_id}`}
+                      />
+                    </label>
+                  </Fragment>
+                );
+              })
+            }
+          </div>
+        </div>
         {
-          hasVoted
-            ? <div>투표에 참여해주셔서 감사합니다 ㅎ</div>
+          isMemberChecking
+            ? (
+              <div className={styles.memberCheck}>
+                <p>별방 비밀번호는 무엇일까요?</p>
+                <div>
+                  <input type="number" className={styles.starRoomPassInput} value={password} onChange={onChangePassword} />
+                  <button type="button" className={styles.iconButton} onClick={submitMemberChecker}>
+                    <img src={submitIcon} alt="submitIcon" className={styles.icon} />
+                  </button>
+                  <button type="button" className={styles.iconButton} onClick={() => setMemberChecker(false)}>
+                    <img src={cancelIcon} alt="cancelIcon" className={styles.icon} />
+                  </button>
+                </div>
+              </div>
+            )
             : (
               <>
-                <div className={styles.scrollAreaWrapper}>
-                  <div className={styles.scrollArea}>
-                    {
-                      photoList.map((_photo) => {
-                        const photoId = `photo${_photo.photo_id}`;
-                        return (
-                          <Fragment key={`thumbnail_${_photo.photo_id}`}>
-                            <input
-                              type="radio"
-                              name="mvpPhoto"
-                              id={photoId}
-                              className={styles.input}
-                              checked={selectedPhoto === _photo.photo_id}
-                              onChange={() => onClickPhoto(_photo.photo_id)}
-                            />
-                            <label
-                              htmlFor={photoId}
-                              className={styles.label}
-                            >
-                              <img
-                                className={styles.thumbnail}
-                                src={`${SERVER_URL}/static/${_photo.thumbnail_path}`}
-                                alt={`thumbnail_${_photo.photo_id}`}
-                              />
-                            </label>
-                          </Fragment>
-                        );
-                      })
-                    }
-                  </div>
+                <div className={styles.memberCheck}>
+                  <input id={memberCheckerId} type="checkbox" className={styles.memberCheckInput} checked={isMember} onChange={onClickMemberChecker} />
+                  <label htmlFor={memberCheckerId} className={styles.memberCheckLabel}>
+                    나는 AAA회원입니다.
+                  </label>
                 </div>
-                {
-                  isMemberChecking
-                    ? (
-                      <div className={styles.memberCheck}>
-                        <p>별방 비밀번호는 무엇일까요?</p>
-                        <div>
-                          <input type="number" className={styles.starRoomPassInput} value={password} onChange={onChangePassword} />
-                          <button type="button" className={styles.iconButton} onClick={submitMemberChecker}>
-                            <img src={submitIcon} alt="submitIcon" className={styles.icon} />
-                          </button>
-                          <button type="button" className={styles.iconButton} onClick={() => setMemberChecker(false)}>
-                            <img src={cancelIcon} alt="cancelIcon" className={styles.icon} />
-                          </button>
-                        </div>
-                      </div>
-                    )
-                    : (
-                      <>
-                        <div className={styles.memberCheck}>
-                          <input id={memberCheckerId} type="checkbox" className={styles.memberCheckInput} checked={isMember} onChange={onClickMemberChecker} />
-                          <label htmlFor={memberCheckerId} className={styles.memberCheckLabel}>
-                            나는 AAA회원입니다.
-                          </label>
-                        </div>
-                        <button type="button" className={styles.submitButton}>
-                          투표하기
-                        </button>
-                      </>
-
-                    )
-                }
+                <button type="button" className={styles.submitButton} onClick={submit}>
+                  투표하기
+                </button>
               </>
             )
         }
-
       </div>
     </>
   );

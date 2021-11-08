@@ -5,6 +5,9 @@ import React, {
 import { css } from '@emotion/css';
 import { fadeIn } from 'src/styles/animation';
 import useToken from 'src/hooks/useToken';
+import useAuth from 'src/hooks/useAuth';
+import useScene from 'src/hooks/useScene';
+import { SCENE } from 'src/recoils/scene';
 import Login from './login';
 import Vote from './vote';
 
@@ -35,6 +38,9 @@ const styles = {
     borderRadius: '2rem',
     background: 'rgba(172, 58, 99, 0.7)',
     transition: 'all ease 0.3s',
+    display: 'flex',
+    flexDirection: 'column',
+    alignItems: 'center',
   }),
   text: css({
     textAlign: 'center',
@@ -44,11 +50,23 @@ const styles = {
     lineHeight: 1.5,
     animation: `${fadeIn} 1s`,
   }),
+  button: css({
+    width: '10rem',
+    background: 'none',
+    padding: '0.5rem',
+    border: '2px solid #FFFFFF',
+    borderRadius: '2rem',
+    color: '#FFFFFF',
+    fontSize: '1.3rem',
+    cursor: 'pointer',
+  }),
 };
 
 const MVP: React.FC = () => {
   const [index, setIndex] = useState<number>(0);
   const { isLogin } = useToken();
+  const { auth: { hasVoted } } = useAuth();
+  const { setScene } = useScene();
 
   useEffect(() => {
     const interval = window.setInterval(() => {
@@ -63,7 +81,21 @@ const MVP: React.FC = () => {
 
   const isMessageEnd = useMemo(() => (index === messages.length), [index]);
 
+  const onClickButton = useCallback(() => {
+    setScene(SCENE.HOME);
+  }, [setScene]);
+
   const makeView = useCallback(() => {
+    if (hasVoted) {
+      return (
+        <div className={styles.textWrapper}>
+          <p className={styles.text}>
+            MVP 투표에 참여해주셔서 감사합니다!
+          </p>
+          <button type="button" className={styles.button} onClick={onClickButton}>홈으로</button>
+        </div>
+      );
+    }
     if (!isMessageEnd) {
       return (
         <div className={styles.textWrapper}>
@@ -85,7 +117,7 @@ const MVP: React.FC = () => {
         <Vote />
       </Suspense>
     );
-  }, [index, isMessageEnd, isLogin]);
+  }, [index, isMessageEnd, isLogin, hasVoted, onClickButton]);
 
   return (
     <>
