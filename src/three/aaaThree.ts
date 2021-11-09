@@ -120,7 +120,9 @@ class AaaThree {
 
   private async load() {
     await this.loadFont();
-    await Promise.all(MODELS_TOWER.map((modelName) => this.loadTower(modelName)));
+    this.towerModels = await Promise.all(
+      MODELS_TOWER.map((modelName) => this.loadTower(modelName)),
+    );
   }
 
   private loadFont() {
@@ -136,21 +138,20 @@ class AaaThree {
     });
   }
 
+  // eslint-disable-next-line class-methods-use-this
   private loadTower(modelName: string) {
     const loader = new GLTFLoader();
     const texture = new THREE.TextureLoader().load(`/assets/models/${modelName}.jpg`);
     texture.flipY = false;
     // texture.encoding = THREE.sRGBEncoding;
-
-    return new Promise<void>((resolve, reject) => {
+    return new Promise<ModelSet>((resolve, reject) => {
       loader.load(`/assets/models/${modelName}.glb`,
         (gltf) => {
-          this.towerModels.push({
+          resolve({
             gltf,
             texture,
             name: modelName,
           });
-          resolve();
         },
         () => {
           // console.log(xhr);
