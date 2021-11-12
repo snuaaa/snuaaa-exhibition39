@@ -1,20 +1,14 @@
-import React, { useCallback, useEffect, useRef } from 'react';
+import React, { useEffect, useRef } from 'react';
 import { css } from '@emotion/css';
 
 import AaaThree from 'src/three/aaaThree';
 import slogan from 'src/assets/images/slogan.svg';
 import { smaller } from 'src/styles/animation';
 import useScene from 'src/hooks/useScene';
-import { SCENE } from 'src/recoils/scene';
+import useWelcome from 'src/hooks/useWelcome';
 import WelcomeMessage from './welcomeMessage';
-import MVP from './mvp';
 
 const styles = {
-  wrapper: css({
-    position: 'relative',
-    overflow: 'hidden',
-    height: '100%',
-  }),
   slogan: css({
     position: 'absolute',
     top: 0,
@@ -36,22 +30,9 @@ const styles = {
 };
 
 const Home: React.FC = () => {
-  const { scene, setScene } = useScene();
+  const { scene } = useScene();
   const aaaThree = useRef<AaaThree>();
-
-  const canvasWrapper = useCallback((ref: HTMLDivElement) => {
-    if (ref && !aaaThree.current) {
-      aaaThree.current = new AaaThree();
-      aaaThree.current.init(ref);
-      aaaThree.current.animate();
-      aaaThree.current.onClickLink = (name) => {
-        if (name === 'link_mvp') {
-          setScene(SCENE.MVP);
-        }
-      };
-      // aaaThree.makeTower(towerModel)
-    }
-  }, [setScene]);
+  const { hasViewed, setHasViewed } = useWelcome();
 
   useEffect(() => {
     if (aaaThree.current) {
@@ -60,16 +41,12 @@ const Home: React.FC = () => {
   }, [scene, aaaThree]);
 
   return (
-    <div className={styles.wrapper}>
-      <div ref={canvasWrapper} className={styles.canvas} />
-      {/* <span > */}
+    <>
       <img className={styles.slogan} src={slogan} alt="for the STARved" />
-      {/* </span> */}
-      <WelcomeMessage />
       {
-        scene === SCENE.MVP && <MVP />
+        !hasViewed && <WelcomeMessage />
       }
-    </div>
+    </>
   );
 };
 

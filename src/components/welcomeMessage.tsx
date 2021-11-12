@@ -1,11 +1,11 @@
-import React, { useMemo, useState } from 'react';
+import React, { useMemo } from 'react';
 import { css, cx } from '@emotion/css';
 import { fadeIn } from 'src/styles/animation';
 import star from 'src/assets/images/star.png';
+import useWelcome from 'src/hooks/useWelcome';
 
 const WelcomeMessage: React.FC = () => {
-  const [isOpened, setIsOpened] = useState<boolean>(true);
-
+  const { hasViewed, setHasViewed } = useWelcome();
   const styles = useMemo(() => ({
     wrapper: css({
       position: 'absolute',
@@ -13,7 +13,7 @@ const WelcomeMessage: React.FC = () => {
       height: '100%',
       width: '100%',
       background: 'linear-gradient(180deg, rgba(12, 13, 45, 0.9) 0%, rgba(9, 18, 65, 0.9) 68.23%, rgba(26, 34, 115, 0.9) 81.25%, rgba(85, 39, 122, 0.9) 94.27%)',
-      display: isOpened ? 'flex' : 'none',
+      display: !hasViewed ? 'flex' : 'none',
       flexDirection: 'column',
       justifyContent: 'center',
       alignItems: 'center',
@@ -46,7 +46,7 @@ const WelcomeMessage: React.FC = () => {
         borderColor: '#c874f2',
       },
     }),
-  }), [isOpened]);
+  }), [hasViewed]);
 
   return (
     <>
@@ -72,7 +72,7 @@ const WelcomeMessage: React.FC = () => {
           <br />
           - AAA 83대 회장 오종주
         </p>
-        <button className={styles.button} type="button" onClick={() => setIsOpened(false)}>사진전 입장하기</button>
+        <button className={styles.button} type="button" onClick={() => setHasViewed(true)}>사진전 입장하기</button>
       </div>
     </>
   );

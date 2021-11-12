@@ -1,25 +1,36 @@
 // import type { NextPage } from 'next';
 // import Head from 'next/head';
-import React from 'react';
+import React, { useCallback } from 'react';
 import Home from 'src/components/home';
 import Intro from 'src/components/intro';
+import MVP from 'src/components/mvp';
+import Gallery from 'src/components/gallery';
+import Canvas from 'src/components/canvas';
 import useScene from 'src/hooks/useScene';
 import { SCENE } from 'src/recoils/scene';
 
 const Page = () => {
   const { scene, setScene } = useScene();
 
+  const switchScene = useCallback(() => {
+    switch (scene) {
+      case SCENE.INTRO:
+        return <Intro skip={() => setScene(SCENE.HOME)} />;
+      case SCENE.HOME:
+        return <Home />;
+      case SCENE.MVP:
+        return <MVP />;
+      case SCENE.GALLERY:
+        return <Gallery />;
+      default:
+        return <Home />;
+    }
+  }, [scene, setScene]);
+
   return (
     <>
-      {/* <Head>
-        <title>For The Starved</title>
-        <meta name="description" content="서울대학교 아마추어 천문회 제39회 천체사진전" />
-        <link rel="icon" href="/favicon.ico" />
-      </Head> */}
-      {
-        scene === SCENE.INTRO && <Intro skip={() => setScene(SCENE.HOME)} />
-      }
-      <Home />
+      <Canvas />
+      {switchScene()}
     </>
   );
 };

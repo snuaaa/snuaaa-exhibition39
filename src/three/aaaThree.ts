@@ -2,15 +2,23 @@ import * as THREE from 'three';
 import Stats from 'three/examples/jsm/libs/stats.module';
 import { GLTF, GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
+
 import opentype from 'opentype.js';
 import { SCENE } from 'src/recoils/scene';
 import { APP_URL } from 'src/config';
+import CustomControl from './customControl';
 import {
   makeBreathingBall, makeFloor, makeLights, makeRandom, makeWords,
 } from './objects';
 import { LinkName, mapName } from './constants';
 
+const SHOOTING_STAR_INTERVAL = 2 * 1000;
 const SHOOTING_STAR_VELOCITY = 0.3;
+const POSITION_HOME = {
+  x: 0,
+  y: 2,
+  z: 13,
+};
 const MODELS_TOWER = [
   'dome',
   'door_guide',
@@ -19,6 +27,13 @@ const MODELS_TOWER = [
   'door_trail',
   'mvp',
   'newbie_project',
+];
+const MODELS_ROOM = [
+  'guide',
+  'solar',
+  'star',
+  'trail',
+  'ob',
 ];
 
 interface ModelSet {
@@ -36,7 +51,7 @@ class AaaThree {
 
   private mouse: THREE.Vector2;
 
-  private controls?: OrbitControls;
+  private controls?: OrbitControls | CustomControl;
 
   private stats = Stats();
 
@@ -48,21 +63,73 @@ class AaaThree {
 
   public onClickLink: (name: string) => void = () => { };
 
-  public towerModels: ModelSet[] = [];
+  private towerModels: ModelSet[] = [];
+
+  private roomModels: ModelSet[] = [];
+
+  private tower?: THREE.Object3D;
+
+  private room?: THREE.Object3D;
+
+  private floor?: THREE.Object3D;
+
+  private loadPromise: Promise<void>;
+
+  private loadResolve: () => void = () => { };
 
   constructor() {
     const fov = window.innerWidth > 800 ? 50 : 70;
     this.camera = new THREE.PerspectiveCamera(
-      fov, window.innerWidth / window.innerHeight,
+      fov,
+      window.innerWidth / window.innerHeight,
       0.01,
-      200,
+      300,
     );
-    this.camera.position.set(0, 2, 13);
 
     this.mouse = new THREE.Vector2();
+    this.loadPromise = new Promise((resolve) => {
+      this.loadResolve = resolve;
+    });
+    this.load();
   }
 
   public init(targetElement: HTMLDivElement) {
+    this.loadPromise
+      .then(() => {
+        this.scene.background = new THREE.Color('#101545');
+        this.scene.fog = new THREE.Fog(0x101545, 15, 25);
+
+        this.floor = makeFloor();
+        this.tower = this.makeTower();
+
+        this.scene.add(this.camera);
+        this.scene.add(...makeLights());
+
+        // this.enterHome();
+
+        const width = document.body.clientWidth;
+        const height = document.body.clientHeight;
+
+        this.renderer.shadowMap.enabled = true;
+        this.renderer.setPixelRatio(window.devicePixelRatio);
+        this.renderer.setSize(width, height);
+        targetElement.appendChild(this.renderer.domElement);
+
+        window.addEventListener('resize', this.onWindowResize.bind(this), false);
+        targetElement.addEventListener('mousemove', (e) => this.onMouseMove(e), false);
+        targetElement.addEventListener('click', () => this.onMouseClick());
+
+        targetElement.appendChild(this.stats.dom);
+      });
+  }
+
+  private enterHome() {
+    if (this.controls instanceof CustomControl) {
+      this.controls.dispose();
+    }
+    this.camera.position.set(POSITION_HOME.x, POSITION_HOME.y, POSITION_HOME.z);
+    this.camera.rotation.set(0, 0, 0);
+
     this.controls = new OrbitControls(this.camera, this.renderer.domElement);
     // controls.listenToKeyEvents( window ); // optional
 
@@ -77,52 +144,92 @@ class AaaThree {
 
     this.controls.maxPolarAngle = Math.PI / 2;
     this.controls.target = new THREE.Vector3(0, 2, 0);
+    this.controls.update();
 
-    this.load()
-      .then(() => {
-        this.scene.background = new THREE.Color('#101545');
-        this.scene.fog = new THREE.Fog(0x101545, 15, 25);
-        const floor = makeFloor();
-        this.makeTower();
+    this.loadPromise.then(() => {
+      if (this.room) {
+        this.scene.remove(this.room);
+      }
+      if (this.floor) {
+        this.scene.add(this.floor);
+      }
+      if (this.tower) {
+        this.scene.add(this.tower);
+      }
+    });
 
-        this.scene.add(this.camera);
-        this.scene.add(...makeLights());
-        this.scene.add(floor);
-
-        this.shootingStarInterval = window.setInterval(() => {
-          this.makeShootingStar();
-        }, 400);
-
-        const width = document.body.clientWidth;
-        const height = document.body.clientHeight;
-
-        this.renderer.shadowMap.enabled = true;
-        this.renderer.setPixelRatio(window.devicePixelRatio);
-        this.renderer.setSize(width, height);
-        targetElement.appendChild(this.renderer.domElement);
-
-        window.addEventListener('resize', this.onWindowResize.bind(this), false);
-        targetElement.addEventListener('mousemove', (e) => this.onMouseMove(e), false);
-        targetElement.addEventListener('click', () => this.onMouseClick());
-
-        document.addEventListener('visibilitychange', () => {
-          if (document.visibilityState === 'hidden') {
-            window.clearInterval(this.shootingStarInterval);
-          } else {
-            this.shootingStarInterval = window.setInterval(() => {
-              this.makeShootingStar();
-            }, 2000);
-          }
-        });
-        targetElement.appendChild(this.stats.dom);
-      });
+    this.shootingStarInterval = window.setInterval(() => {
+      this.makeShootingStar();
+    }, SHOOTING_STAR_INTERVAL);
+    document.addEventListener('visibilitychange', this.onVisibilityChange);
   }
+
+  private enterGallery() {
+    if (this.tower) {
+      this.scene.remove(this.tower);
+    }
+    if (this.floor) {
+      this.scene.remove(this.floor);
+    }
+    this.room = this.makeRoom();
+    this.scene.add(this.room);
+    this.scene.fog = null;
+    if (this.controls instanceof OrbitControls) {
+      this.controls.dispose();
+    }
+
+    this.camera.position.set(POSITION_HOME.x, POSITION_HOME.y, POSITION_HOME.z);
+    this.camera.rotation.set(0, 0, 0);
+    const controls = new CustomControl(this.camera, this.renderer.domElement);
+    controls.connect();
+
+    document.removeEventListener('visibilitychange', this.onVisibilityChange);
+    window.clearInterval(this.shootingStarInterval);
+
+    document.addEventListener('keydown', (e) => {
+      switch (e.key) {
+        case 'ArrowUp':
+        case 'w':
+          controls.moveForward(0.5);
+          break;
+        case 'ArrowRight':
+        case 'd':
+          controls.moveRight(0.5);
+          break;
+        case 'ArrowDown':
+        case 's':
+          controls.moveForward(-0.5);
+          break;
+        case 'ArrowLeft':
+        case 'a':
+          controls.moveRight(-0.5);
+          break;
+        default:
+          break;
+      }
+    });
+    this.controls = controls;
+  }
+
+  private onVisibilityChange = () => {
+    if (document.visibilityState === 'hidden') {
+      window.clearInterval(this.shootingStarInterval);
+    } else {
+      this.shootingStarInterval = window.setInterval(() => {
+        this.makeShootingStar();
+      }, SHOOTING_STAR_INTERVAL);
+    }
+  };
 
   private async load() {
     await this.loadFont();
     this.towerModels = await Promise.all(
       MODELS_TOWER.map((modelName) => this.loadTower(modelName)),
     );
+    this.roomModels = await Promise.all(
+      MODELS_ROOM.map((modelName) => this.loadRoom(modelName)),
+    );
+    this.loadResolve();
   }
 
   private loadFont() {
@@ -139,28 +246,29 @@ class AaaThree {
   }
 
   // eslint-disable-next-line class-methods-use-this
-  private loadTower(modelName: string) {
-    const loader = new GLTFLoader();
-    const texture = new THREE.TextureLoader().load(`/assets/models/${modelName}.jpg`);
+  private async loadTower(modelName: string) {
+    const texture = await new THREE.TextureLoader().loadAsync(`/assets/models/${modelName}.jpg`);
     texture.flipY = false;
     // texture.encoding = THREE.sRGBEncoding;
-    return new Promise<ModelSet>((resolve, reject) => {
-      loader.load(`/assets/models/${modelName}.glb`,
-        (gltf) => {
-          resolve({
-            gltf,
-            texture,
-            name: modelName,
-          });
-        },
-        () => {
-          // console.log(xhr);
-        },
-        (err) => {
-          console.error(err);
-          reject(err);
-        });
-    });
+    const gltf = await new GLTFLoader().loadAsync(`/assets/models/${modelName}.glb`);
+    return {
+      gltf,
+      texture,
+      name: modelName,
+    };
+  }
+
+  // eslint-disable-next-line class-methods-use-this
+  private async loadRoom(modelName: string) {
+    const texture = await new THREE.TextureLoader().loadAsync(`/assets/models/room/${modelName}.jpg`);
+    texture.flipY = false;
+    // texture.encoding = THREE.sRGBEncoding;
+    const gltf = await new GLTFLoader().loadAsync(`/assets/models/room/${modelName}.glb`);
+    return {
+      gltf,
+      texture,
+      name: modelName,
+    };
   }
 
   public moveCamera(scene: SCENE) {
@@ -176,13 +284,10 @@ class AaaThree {
         // this.camera.quaternion.slerp
         break;
       case SCENE.HOME:
-        this.camera.position.x = 0;
-        this.camera.position.y = 2;
-        this.camera.position.z = 13;
-        this.camera.rotation.x = 0;
-        this.camera.rotation.y = 0;
-        this.camera.rotation.z = 0;
-        this.camera.fov = window.innerWidth > 800 ? 50 : 70;
+        this.enterHome();
+        break;
+      case SCENE.GALLERY:
+        this.enterGallery();
         break;
       default:
         break;
@@ -190,6 +295,8 @@ class AaaThree {
   }
 
   public makeTower() {
+    const tower = new THREE.Object3D();
+
     this.towerModels.forEach(({
       gltf,
       texture,
@@ -236,8 +343,34 @@ class AaaThree {
       });
       object.add(gltf.scene);
       object.rotateY(20 * (Math.PI / 180));
-      this.scene.add(object);
+      // this.tower = object;
+      // this.scene.add(object);
+      tower.add(object);
     });
+    return tower;
+  }
+
+  public makeRoom() {
+    const room = new THREE.Object3D();
+
+    this.roomModels.forEach(({
+      gltf,
+      texture,
+    }) => {
+      const object = new THREE.Object3D();
+      gltf.scene.traverse((child) => {
+        const material = new THREE.MeshBasicMaterial({ map: texture });
+        // const material = new THREE.MeshBasicMaterial();
+        if (child instanceof THREE.Mesh) {
+          child.material = material;
+        }
+      });
+      object.add(gltf.scene);
+      object.rotateY(20 * (Math.PI / 180));
+      room.add(object);
+      // this.scene.add(object);
+    });
+    return room;
   }
 
   private onWindowResize() {
@@ -290,8 +423,7 @@ class AaaThree {
 
   public animate() {
     requestAnimationFrame(this.animate.bind(this));
-
-    this.controls?.update();
+    // this.controls?.update();
     this.stats.update();
     this.renderer.render(this.scene, this.camera);
   }
