@@ -92,31 +92,6 @@ class CustomControl extends EventDispatcher {
     this.dispatchEvent(changeEvent);
   }
 
-  private onMouseDown(e: MouseEvent) {
-    this.mouseX = e.clientX;
-    this.mouseY = e.clientY;
-    this.isRotating = true;
-  }
-
-  private onMouseUp(e: MouseEvent) {
-    this.mouseX = e.clientX;
-    this.mouseY = e.clientY;
-
-    this.isRotating = false;
-  }
-
-  private onMouseMove(e: MouseEvent) {
-    if (this.isRotating) {
-      this.rotate((-0.2 * e.movementX), (-0.2 * e.movementY));
-    }
-    this.mouseX = e.clientX;
-    this.mouseY = e.clientY;
-  }
-
-  private onMouseOut() {
-    this.isRotating = false;
-  }
-
   private onTouchStart(e: TouchEvent) {
     // e.preventDefault();
     this.mouseX = e.touches[0].clientX;
@@ -159,42 +134,74 @@ class CustomControl extends EventDispatcher {
     return this.camera;
   }
 
+  private mouseDownEventHandler = (e: MouseEvent) => {
+    this.mouseX = e.clientX;
+    this.mouseY = e.clientY;
+    this.isRotating = true;
+  };
+
+  private mouseUpEventHandler = (e: MouseEvent) => {
+    this.mouseX = e.clientX;
+    this.mouseY = e.clientY;
+
+    this.isRotating = false;
+  };
+
+  private mouseMoveEventHandler = (e: MouseEvent) => {
+    if (this.isRotating) {
+      this.rotate((-0.2 * e.movementX), (-0.2 * e.movementY));
+    }
+    this.mouseX = e.clientX;
+    this.mouseY = e.clientY;
+  };
+
+  private mouseOutHandler = () => {
+    this.isRotating = false;
+  };
+
+  private keyDownHandler = (e: KeyboardEvent) => {
+    switch (e.key) {
+      case 'ArrowUp':
+      case 'w':
+        this.moveForward(0.5);
+        break;
+      case 'ArrowRight':
+      case 'd':
+        this.moveRight(0.5);
+        break;
+      case 'ArrowDown':
+      case 's':
+        this.moveForward(-0.5);
+        break;
+      case 'ArrowLeft':
+      case 'a':
+        this.moveRight(-0.5);
+        break;
+      default:
+        break;
+    }
+  };
+
   public connect() {
-    // this.domElement.ownerDocument.addEventListener('mousemove', (e) => this.onMouseMove(e));
     this.domElement.ownerDocument.addEventListener('pointerlockchange', () => this.onPointerlockChange());
     this.domElement.ownerDocument.addEventListener('pointerlockerror', () => this.onPointerlockError());
-    this.domElement.addEventListener('mousedown', (e) => this.onMouseDown(e));
-    this.domElement.addEventListener('mouseup', (e) => this.onMouseUp(e));
-    this.domElement.addEventListener('mousemove', (e) => this.onMouseMove(e));
-    this.domElement.addEventListener('mouseout', () => this.onMouseOut());
 
-    // document.addEventListener('keydown', (e) => {
-    //   console.log('hi');
-    //   switch (e.key) {
-    //     case 'ArrowUp':
-    //       controls.moveForward(1);
-    //       break;
-    //     case 'ArrowRight':
-    //       controls.moveRight(1);
-    //       break;
-    //     case 'ArrowDown':
-    //       controls.moveForward(-1);
-    //       break;
-    //     case 'ArrowLeft':
-    //       controls.moveRight(-1);
-    //       break;
-    //     default:
-    //       break;
-    //   }
-    // });
-    // this.controls = controls;
-    // this.domElement.addEventListener('mousedown', (e) => this.onMouseDown(e));
+    this.domElement.addEventListener('mousedown', this.mouseDownEventHandler);
+    this.domElement.addEventListener('mouseup', this.mouseUpEventHandler);
+    this.domElement.addEventListener('mousemove', this.mouseMoveEventHandler);
+    this.domElement.addEventListener('mouseout', this.mouseOutHandler);
+    document.addEventListener('keydown', this.keyDownHandler);
   }
 
   public disconnect() {
-    // this.domElement.ownerDocument.removeEventListener('mousemove', (e) => this.onMouseMove(e));
     this.domElement.ownerDocument.removeEventListener('pointerlockchange', () => this.onPointerlockChange());
     this.domElement.ownerDocument.removeEventListener('pointerlockerror', () => this.onPointerlockError());
+
+    this.domElement.removeEventListener('mousedown', this.mouseDownEventHandler);
+    this.domElement.removeEventListener('mouseup', this.mouseUpEventHandler);
+    this.domElement.removeEventListener('mousemove', this.mouseMoveEventHandler);
+    this.domElement.removeEventListener('mouseout', this.mouseOutHandler);
+    document.addEventListener('keydown', this.keyDownHandler);
   }
 
   public moveForward(distance: number) {

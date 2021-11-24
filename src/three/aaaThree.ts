@@ -1,6 +1,7 @@
 import * as THREE from 'three';
 import Stats from 'three/examples/jsm/libs/stats.module';
 import { GLTF, GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader';
+import { DRACOLoader } from 'three/examples/jsm/loaders/DRACOLoader';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
 
 import opentype from 'opentype.js';
@@ -29,11 +30,18 @@ const MODELS_TOWER = [
   'newbie_project',
 ];
 const MODELS_ROOM = [
-  'guide',
-  'solar',
-  'star',
-  'trail',
-  'ob',
+  // 'guide',
+  // 'solar1',
+  // 'solar2',
+  'star_items',
+  'star_buildings',
+  'star_frames',
+  'solar_room',
+  'solar_items',
+  // 'star',
+  // 'trail',
+  'ob_room',
+  'ob_items',
 ];
 
 interface ModelSet {
@@ -83,7 +91,7 @@ class AaaThree {
       fov,
       window.innerWidth / window.innerHeight,
       0.01,
-      300,
+      1000,
     );
 
     this.mouse = new THREE.Vector2();
@@ -186,28 +194,6 @@ class AaaThree {
     document.removeEventListener('visibilitychange', this.onVisibilityChange);
     window.clearInterval(this.shootingStarInterval);
 
-    document.addEventListener('keydown', (e) => {
-      switch (e.key) {
-        case 'ArrowUp':
-        case 'w':
-          controls.moveForward(0.5);
-          break;
-        case 'ArrowRight':
-        case 'd':
-          controls.moveRight(0.5);
-          break;
-        case 'ArrowDown':
-        case 's':
-          controls.moveForward(-0.5);
-          break;
-        case 'ArrowLeft':
-        case 'a':
-          controls.moveRight(-0.5);
-          break;
-        default:
-          break;
-      }
-    });
     this.controls = controls;
   }
 
@@ -260,10 +246,18 @@ class AaaThree {
 
   // eslint-disable-next-line class-methods-use-this
   private async loadRoom(modelName: string) {
+    console.log('loadRoom');
+
     const texture = await new THREE.TextureLoader().loadAsync(`/assets/models/room/${modelName}.jpg`);
     texture.flipY = false;
+    console.log('loadtexture');
     // texture.encoding = THREE.sRGBEncoding;
-    const gltf = await new GLTFLoader().loadAsync(`/assets/models/room/${modelName}.glb`);
+    const dracoLoader = new DRACOLoader();
+    dracoLoader.setDecoderPath('/draco/');
+
+    const gltfLoader = new GLTFLoader();
+    gltfLoader.setDRACOLoader(dracoLoader);
+    const gltf = await gltfLoader.loadAsync(`/assets/models/room/${modelName}.glb`);
     return {
       gltf,
       texture,
