@@ -257,9 +257,7 @@ class AaaThree {
     dracoLoader.setDecoderPath('/draco/');
 
     const gltfLoader = new GLTFLoader();
-    if (modelName === 'floor') {
-      gltfLoader.setDRACOLoader(dracoLoader);
-    }
+    gltfLoader.setDRACOLoader(dracoLoader);
     const gltf = await gltfLoader.loadAsync(`/assets/models/home/${modelName}.glb`);
     return {
       gltf,
