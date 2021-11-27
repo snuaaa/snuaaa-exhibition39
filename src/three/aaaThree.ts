@@ -83,6 +83,8 @@ class AaaThree {
 
   private floor?: THREE.Object3D;
 
+  private roomBackground?: THREE.CubeTexture;
+
   private loadPromise: Promise<void>;
 
   private loadResolve: () => void = () => { };
@@ -106,23 +108,6 @@ class AaaThree {
   public init(targetElement: HTMLDivElement) {
     this.loadPromise
       .then(() => {
-        this.scene.background = new THREE.Color('#101545');
-        this.scene.fog = new THREE.Fog(0x101545, 15, 25);
-
-        const path = '/assets/models/room/background/';
-        const format = '.jpg';
-        const urls = [
-          `${path}px${format}`, `${path}nx${format}`,
-          `${path}py${format}`, `${path}ny${format}`,
-          `${path}pz${format}`, `${path}nz${format}`,
-        ];
-
-        const reflectionCube = new THREE.CubeTextureLoader().load(urls);
-        const refractionCube = new THREE.CubeTextureLoader().load(urls);
-        refractionCube.mapping = THREE.CubeRefractionMapping;
-
-        this.scene.background = reflectionCube;
-
         this.tower = this.makeTower();
 
         this.scene.add(this.camera);
@@ -177,6 +162,8 @@ class AaaThree {
         this.scene.add(this.tower);
       }
     });
+    this.scene.background = new THREE.Color('#101545');
+    this.scene.fog = new THREE.Fog(0x101545, 15, 25);
 
     this.shootingStarInterval = window.setInterval(() => {
       this.makeShootingStar();
@@ -190,6 +177,9 @@ class AaaThree {
     }
     if (this.floor) {
       this.scene.remove(this.floor);
+    }
+    if (this.roomBackground) {
+      this.scene.background = this.roomBackground;
     }
     this.room = this.makeRoom();
     this.scene.add(this.room);
@@ -227,6 +217,7 @@ class AaaThree {
     this.roomModels = await Promise.all(
       MODELS_ROOM.map((modelName) => this.loadRoom(modelName)),
     );
+    await this.loadRoomBackground();
     this.loadResolve();
   }
 
@@ -277,6 +268,27 @@ class AaaThree {
       texture,
       name: modelName,
     };
+  }
+
+  private loadRoomBackground() {
+    return new Promise<void>((resolve, reject) => {
+      const path = '/assets/models/room/background/';
+      const format = '.jpg';
+      const urls = [
+        `${path}px${format}`, `${path}nx${format}`,
+        `${path}py${format}`, `${path}ny${format}`,
+        `${path}pz${format}`, `${path}nz${format}`,
+      ];
+
+      new THREE.CubeTextureLoader().load(urls, (texture) => {
+        this.roomBackground = texture;
+        resolve();
+      }, () => {
+
+      }, (err) => {
+        reject(err);
+      });
+    });
   }
 
   public moveCamera(scene: SCENE) {
