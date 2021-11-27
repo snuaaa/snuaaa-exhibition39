@@ -109,6 +109,21 @@ class AaaThree {
         this.scene.background = new THREE.Color('#101545');
         this.scene.fog = new THREE.Fog(0x101545, 15, 25);
 
+        const path = '/assets/models/room/background/';
+        const format = '.jpg';
+        const urls = [
+          `${path}px${format}`, `${path}nx${format}`,
+          `${path}py${format}`, `${path}ny${format}`,
+          `${path}pz${format}`, `${path}nz${format}`,
+        ];
+
+        const reflectionCube = new THREE.CubeTextureLoader().load(urls);
+        const refractionCube = new THREE.CubeTextureLoader().load(urls);
+        refractionCube.mapping = THREE.CubeRefractionMapping;
+
+        // scene = new THREE.Scene();
+        this.scene.background = reflectionCube;
+
         this.floor = makeFloor();
         this.tower = this.makeTower();
 
