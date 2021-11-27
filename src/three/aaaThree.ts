@@ -28,18 +28,20 @@ const MODELS_TOWER = [
   'door_trail',
   'mvp',
   'newbie_project',
+  'floor',
 ];
 const MODELS_ROOM = [
-  // 'guide',
-  // 'solar1',
-  // 'solar2',
   'star_items',
   'star_buildings',
   'star_frames',
+  'trail_room',
+  'trail_items',
+  'trail_frames',
+  'guide_room',
+  'guide_items',
+  'guide_frames',
   'solar_room',
   'solar_items',
-  // 'star',
-  // 'trail',
   'ob_room',
   'ob_items',
 ];
@@ -233,10 +235,17 @@ class AaaThree {
 
   // eslint-disable-next-line class-methods-use-this
   private async loadTower(modelName: string) {
-    const texture = await new THREE.TextureLoader().loadAsync(`/assets/models/${modelName}.jpg`);
+    const texture = await new THREE.TextureLoader().loadAsync(`/assets/models/home/${modelName}.jpg`);
     texture.flipY = false;
     // texture.encoding = THREE.sRGBEncoding;
-    const gltf = await new GLTFLoader().loadAsync(`/assets/models/${modelName}.glb`);
+    const dracoLoader = new DRACOLoader();
+    dracoLoader.setDecoderPath('/draco/');
+
+    const gltfLoader = new GLTFLoader();
+    if (modelName === 'floor') {
+      gltfLoader.setDRACOLoader(dracoLoader);
+    }
+    const gltf = await gltfLoader.loadAsync(`/assets/models/home/${modelName}.glb`);
     return {
       gltf,
       texture,
@@ -246,11 +255,8 @@ class AaaThree {
 
   // eslint-disable-next-line class-methods-use-this
   private async loadRoom(modelName: string) {
-    console.log('loadRoom');
-
     const texture = await new THREE.TextureLoader().loadAsync(`/assets/models/room/${modelName}.jpg`);
     texture.flipY = false;
-    console.log('loadtexture');
     // texture.encoding = THREE.sRGBEncoding;
     const dracoLoader = new DRACOLoader();
     dracoLoader.setDecoderPath('/draco/');
