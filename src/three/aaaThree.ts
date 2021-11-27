@@ -73,9 +73,13 @@ class AaaThree {
 
   public onClickLink: (name: string) => void = () => { };
 
+  public onClickPhoto: (photoId: string) => void = () => { };
+
   private towerModels: ModelSet[] = [];
 
   private roomModels: ModelSet[] = [];
+
+  private photoModels: THREE.Mesh[] = [];
 
   private tower?: THREE.Object3D;
 
@@ -273,7 +277,7 @@ class AaaThree {
   private loadRoomBackground() {
     return new Promise<void>((resolve, reject) => {
       const path = '/assets/models/room/background/';
-      const format = '.jpg';
+      const format = '.png';
       const urls = [
         `${path}px${format}`, `${path}nx${format}`,
         `${path}py${format}`, `${path}ny${format}`,
@@ -380,9 +384,20 @@ class AaaThree {
       const object = new THREE.Object3D();
       gltf.scene.traverse((child) => {
         const material = new THREE.MeshBasicMaterial({ map: texture });
-        // const material = new THREE.MeshBasicMaterial();
         if (child instanceof THREE.Mesh) {
           child.material = material;
+          if (child.name.includes('photo_')) {
+            this.photoModels.push(child);
+            child.addEventListener('click', () => {
+              this.onClickPhoto(child.name);
+            });
+            child.addEventListener('mouseenter', () => {
+              document.body.style.cursor = 'pointer';
+            });
+            child.addEventListener('mouseout', () => {
+              document.body.style.cursor = 'default';
+            });
+          }
         }
       });
       object.add(gltf.scene);

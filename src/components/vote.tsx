@@ -142,13 +142,13 @@ const styles = {
 const Vote: React.FC = () => {
   const photoList = useRecoilValue(photo);
   const memberCheckerId = 'memberChecker';
-  const [selectedPhoto, setSelectedPhoto] = useState<number | null>(null);
+  const [selectedPhoto, setSelectedPhoto] = useState<string | null>(null);
   const [memberChecker, setMemberChecker] = useState<boolean>(false);
   const [password, setPassword] = useState<string>('');
   const { auth, setAuth, authMember } = useAuth();
   const { isMember } = auth;
 
-  const onClickPhoto = useCallback((photoId: number) => {
+  const onClickPhoto = useCallback((photoId: string) => {
     if (photoId === selectedPhoto) {
       setSelectedPhoto(null);
     } else {

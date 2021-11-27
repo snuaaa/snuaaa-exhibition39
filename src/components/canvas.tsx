@@ -41,7 +41,9 @@ const Canvas: React.FC = () => {
             break;
         }
       };
-      // aaaThree.makeTower(towerModel)
+      aaaThree.current.onClickPhoto = (name) => {
+        console.log(name);
+      };
     }
   }, [setScene]);
 

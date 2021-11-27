@@ -1,5 +1,5 @@
 interface Photo {
-  photo_id: number,
+  photo_id: string,
   photograper: string,
   title: string,
   location: string,
