@@ -9,7 +9,7 @@ import { SCENE } from 'src/recoils/scene';
 import { APP_URL } from 'src/config';
 import CustomControl from './customControl';
 import {
-  makeBreathingBall, makeFloor, makeLights, makeRandom, makeWords,
+  makeBreathingBall, makeLights, makeRandom, makeWords,
 } from './objects';
 import { LinkName, mapName } from './constants';
 
@@ -121,10 +121,8 @@ class AaaThree {
         const refractionCube = new THREE.CubeTextureLoader().load(urls);
         refractionCube.mapping = THREE.CubeRefractionMapping;
 
-        // scene = new THREE.Scene();
         this.scene.background = reflectionCube;
 
-        this.floor = makeFloor();
         this.tower = this.makeTower();
 
         this.scene.add(this.camera);
@@ -174,9 +172,6 @@ class AaaThree {
     this.loadPromise.then(() => {
       if (this.room) {
         this.scene.remove(this.room);
-      }
-      if (this.floor) {
-        this.scene.add(this.floor);
       }
       if (this.tower) {
         this.scene.add(this.tower);
