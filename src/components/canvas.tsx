@@ -1,4 +1,6 @@
-import React, { useCallback, useEffect, useRef } from 'react';
+import React, {
+  useCallback, useEffect, useMemo, useRef,
+} from 'react';
 import { css } from '@emotion/css';
 
 import AaaThree from 'src/three/aaaThree';
@@ -6,20 +8,20 @@ import { LinkName } from 'src/three/constants';
 import useScene from 'src/hooks/useScene';
 import { SCENE } from 'src/recoils/scene';
 
-const styles = {
-  wrapper: css({
-    position: 'relative',
-    overflow: 'hidden',
-    height: '100%',
-  }),
-  canvas: css({
-    userSelect: 'none',
-  }),
-};
-
 const Canvas: React.FC = () => {
   const { scene, setScene } = useScene();
   const aaaThree = useRef<AaaThree>();
+
+  const styles = useMemo(() => ({
+    wrapper: css({
+      position: 'relative',
+      overflow: 'hidden',
+    }),
+    canvas: css({
+      userSelect: 'none',
+      display: scene === SCENE.INTRO ? 'none' : 'block',
+    }),
+  }), [scene]);
 
   const canvasWrapper = useCallback((ref: HTMLDivElement) => {
     if (ref && !aaaThree.current) {
