@@ -4,7 +4,7 @@ import React, {
 import { css } from '@emotion/css';
 
 import AaaThree from 'src/three/aaaThree';
-import { LinkName } from 'src/three/constants';
+import { LinkName, RoomName } from 'src/three/constants';
 import { SCENE } from 'src/recoils/scene';
 import useScene from 'src/hooks/useScene';
 import useSelectedPhoto from 'src/hooks/useSelectedPhoto';
@@ -32,14 +32,32 @@ const Canvas: React.FC = () => {
       aaaThree.current.animate();
       aaaThree.current.onClickLink = (name) => {
         switch (name) {
+          case LinkName.INTRO:
+            window.location.replace('https://www.snuaaa.net/');
+            break;
           case LinkName.MVP:
             setScene(SCENE.MVP);
+            aaaThree.current?.moveScene(SCENE.MVP);
             break;
           case LinkName.STAR:
+            setScene(SCENE.GALLERY);
+            aaaThree.current?.moveScene(SCENE.GALLERY);
+            aaaThree.current?.moveRoom(RoomName.STAR);
+            break;
           case LinkName.TRAIL:
+            setScene(SCENE.GALLERY);
+            aaaThree.current?.moveScene(SCENE.GALLERY);
+            aaaThree.current?.moveRoom(RoomName.TRAIL);
+            break;
           case LinkName.GUIDE:
+            setScene(SCENE.GALLERY);
+            aaaThree.current?.moveScene(SCENE.GALLERY);
+            aaaThree.current?.moveRoom(RoomName.GUIDE);
+            break;
           case LinkName.SOLAR:
             setScene(SCENE.GALLERY);
+            aaaThree.current?.moveScene(SCENE.GALLERY);
+            aaaThree.current?.moveRoom(RoomName.SOLAR);
             break;
           default:
             break;
@@ -53,7 +71,9 @@ const Canvas: React.FC = () => {
 
   useEffect(() => {
     if (aaaThree.current) {
-      aaaThree.current.moveCamera(scene);
+      if (scene === SCENE.HOME) {
+        aaaThree.current.moveScene(SCENE.HOME);
+      }
     }
   }, [scene, aaaThree]);
 

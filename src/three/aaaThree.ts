@@ -11,7 +11,9 @@ import CustomControl from './customControl';
 import {
   makeBreathingBall, makeLights, makeRandom, makeWords,
 } from './objects';
-import { LinkName, mapName } from './constants';
+import {
+  LinkName, mapName, mapRoomToCamera, RoomName,
+} from './constants';
 
 const SHOOTING_STAR_INTERVAL = 2 * 1000;
 const SHOOTING_STAR_VELOCITY = 0.3;
@@ -32,7 +34,7 @@ const MODELS_TOWER = [
 ];
 const MODELS_ROOM = [
   'star_items',
-  'star_buildings',
+  'star_room',
   'star_frames',
   'trail_room',
   'trail_items',
@@ -74,6 +76,8 @@ class AaaThree {
   public onClickLink: (name: string) => void = () => { };
 
   public onClickPhoto: (photoId: string) => void = () => { };
+
+  public onLoad: () => void = () => { };
 
   private towerModels: ModelSet[] = [];
 
@@ -191,6 +195,7 @@ class AaaThree {
     if (this.controls instanceof OrbitControls) {
       this.controls.dispose();
     }
+    (window as any).camera = this.camera;
 
     this.camera.position.set(POSITION_HOME.x, POSITION_HOME.y, POSITION_HOME.z);
     this.camera.rotation.set(0, 0, 0);
@@ -223,6 +228,7 @@ class AaaThree {
     );
     await this.loadRoomBackground();
     this.loadResolve();
+    this.onLoad();
   }
 
   private loadFont() {
@@ -295,7 +301,7 @@ class AaaThree {
     });
   }
 
-  public moveCamera(scene: SCENE) {
+  public moveScene(scene: SCENE) {
     switch (scene) {
       case SCENE.MVP:
         this.camera.position.x = 0.36;
@@ -318,6 +324,17 @@ class AaaThree {
     }
   }
 
+  public moveRoom(room: RoomName) {
+    if (this.controls instanceof CustomControl) {
+      const cameraInfo = mapRoomToCamera(room);
+      if (cameraInfo) {
+        const { position, rotation } = cameraInfo;
+        this.controls.setPosition(position.x, position.y, position.z);
+        this.controls.setRotation(rotation.x, rotation.y, rotation.z);
+      }
+    }
+  }
+
   public makeTower() {
     const tower = new THREE.Object3D();
 
@@ -333,6 +350,10 @@ class AaaThree {
           if (child.name.includes('link') && this.font) {
             this.linkObjects.push(child);
             const linkName = mapName(child.name as LinkName);
+            if (!linkName) {
+              console.error(`Not matched linkname: ${child.name}`);
+              return;
+            }
             const word = makeWords(
               linkName,
               this.font,
@@ -469,9 +490,9 @@ class AaaThree {
 
     const mouseRayCaster = new THREE.Raycaster();
     mouseRayCaster.setFromCamera(this.mouse, this.camera);
-    mouseRayCaster.far = 20;
+    mouseRayCaster.far = 100;
 
-    const intersects = mouseRayCaster.intersectObjects(this.linkObjects);
+    const intersects = mouseRayCaster.intersectObjects([...this.linkObjects, ...this.photoModels]);
     if (intersects && intersects[0] && intersects[0].object instanceof THREE.Mesh) {
       const { object } = intersects[0];
       if (!object.userData.isMouseEnter) {
@@ -494,9 +515,9 @@ class AaaThree {
   private onMouseClick() {
     const mouseRayCaster = new THREE.Raycaster();
     mouseRayCaster.setFromCamera(this.mouse, this.camera);
-    mouseRayCaster.far = 20;
+    mouseRayCaster.far = 100;
 
-    const intersects = mouseRayCaster.intersectObjects(this.linkObjects);
+    const intersects = mouseRayCaster.intersectObjects([...this.linkObjects, ...this.photoModels]);
     if (intersects && intersects[0] && intersects[0].object instanceof THREE.Mesh) {
       const { object } = intersects[0];
       object.dispatchEvent({

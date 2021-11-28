@@ -201,7 +201,15 @@ class CustomControl extends EventDispatcher {
     this.domElement.removeEventListener('mouseup', this.mouseUpEventHandler);
     this.domElement.removeEventListener('mousemove', this.mouseMoveEventHandler);
     this.domElement.removeEventListener('mouseout', this.mouseOutHandler);
-    document.addEventListener('keydown', this.keyDownHandler);
+    document.removeEventListener('keydown', this.keyDownHandler);
+  }
+
+  public setPosition(x: number, y: number, z: number) {
+    this.camera.position.set(x, y, z);
+  }
+
+  public setRotation(x: number, y: number, z: number) {
+    this.camera.rotation.set(x, y, z);
   }
 
   public moveForward(distance: number) {

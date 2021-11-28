@@ -31,3 +31,64 @@ export const mapName = (modelName: LinkName) => {
 
   return map[modelName];
 };
+
+export enum RoomName {
+  STAR,
+  TRAIL,
+  GUIDE,
+  SOLAR,
+}
+
+export const mapRoomToCamera = (room: RoomName) => {
+  const map = {
+    [RoomName.STAR]: {
+      position: {
+        x: 193,
+        y: -130,
+        z: -180,
+      },
+      rotation: {
+        x: 0,
+        y: -1.06,
+        z: 0,
+      },
+    },
+    [RoomName.TRAIL]: {
+      position: {
+        x: 248,
+        y: -40,
+        z: 67,
+      },
+      rotation: {
+        x: -3.07,
+        y: -0.15,
+        z: -3.13,
+      },
+    },
+    [RoomName.GUIDE]: {
+      position: {
+        x: 43,
+        y: 90,
+        z: -212,
+      },
+      rotation: {
+        x: -0.09,
+        y: 0.02,
+        z: 0.004,
+      },
+    },
+    [RoomName.SOLAR]: {
+      position: {
+        x: 25,
+        y: 0,
+        z: -25,
+      },
+      rotation: {
+        x: 3.08,
+        y: 1.06,
+        z: -3.08,
+      },
+    },
+  };
+  return map[room];
+};

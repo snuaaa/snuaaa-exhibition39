@@ -36,7 +36,7 @@ const Home: React.FC = () => {
 
   useEffect(() => {
     if (aaaThree.current) {
-      aaaThree.current.moveCamera(scene);
+      aaaThree.current.moveScene(scene);
     }
   }, [scene, aaaThree]);
 
