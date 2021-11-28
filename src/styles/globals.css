@@ -24,6 +24,11 @@ a {
   height: 100%;
 }
 
+button {
+  border: none;
+  cursor: pointer;
+}
+
 @font-face {
   font-family: 'FOUREYES';
   src: url('https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_one@1.0/FOUREYES.woff') format('woff');

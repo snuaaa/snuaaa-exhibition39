@@ -10,6 +10,8 @@ import locationIcon from 'src/assets/icons/location.svg';
 import equipmentIcon from 'src/assets/icons/equipment.svg';
 import exposureIcon from 'src/assets/icons/exposure.svg';
 import processingIcon from 'src/assets/icons/processing.svg';
+import cancelIcon from 'src/assets/icons/cancel.svg';
+import useSelectedPhoto from 'src/hooks/useSelectedPhoto';
 
 type Props = {
   photoId: string;
@@ -34,13 +36,29 @@ const PhotoDetail: React.FC<Props> = ({ photoId }) => {
         flexDirection: 'column',
       },
     }),
+    cancelButton: css({
+      background: 'rgba(255, 255, 255, 0.3)',
+      borderRadius: '50%',
+      position: 'absolute',
+      top: '2rem',
+      right: '2rem',
+      padding: '1rem',
+      boxShadow: 'none',
+    }),
+    cancelIcon: css({
+      height: '1rem',
+      width: '1rem',
+      display: 'block',
+    }),
     imgWrapper: css({
       display: 'flex',
+      justifyContent: 'center',
       width: '60%',
       height: '100%',
       background: '#000000',
       '@media screen and (max-width: 800px)': {
         width: '100%',
+        maxHeight: '40%',
       },
     }),
     img: css({
@@ -53,11 +71,13 @@ const PhotoDetail: React.FC<Props> = ({ photoId }) => {
       background: '#00204E',
       height: '100%',
       display: 'flex',
+      position: 'relative',
       padding: '3rem',
       justifyContent: 'center',
       flexDirection: 'column',
       '@media screen and (max-width: 800px)': {
         width: '100%',
+        overflow: 'auto',
       },
     }),
     icon: css({
@@ -75,6 +95,7 @@ const PhotoDetail: React.FC<Props> = ({ photoId }) => {
       color: '#FFFFFF',
       display: 'flex',
       alignItems: 'center',
+      wordBreak: 'break-word',
     }),
     description: css({
       fontSize: '0.9rem',
@@ -86,12 +107,18 @@ const PhotoDetail: React.FC<Props> = ({ photoId }) => {
       display: 'flex',
       flexDirection: 'column',
       justifyContent: 'center',
+      '@media screen and (max-width: 800px)': {
+        height: 'auto',
+      },
     }),
     detailBottom: css({
       height: '50%',
       display: 'flex',
       flexDirection: 'column',
       justifyContent: 'center',
+      '@media screen and (max-width: 800px)': {
+        height: 'auto',
+      },
     }),
     divider: css({
       width: '100%',
@@ -100,11 +127,12 @@ const PhotoDetail: React.FC<Props> = ({ photoId }) => {
       textAlign: 'center',
       color: '#FFFFFF',
       '&::after': {
-        content: '"........................"',
+        content: '"................................................"',
       },
     }),
   }), []);
 
+  const { setSelectedPhoto } = useSelectedPhoto();
   const photoList = useRecoilValue(photoSelector);
   const photoInfo = useMemo(
     () => photoList.find((photo) => photo.photo_id === photoId),
@@ -125,6 +153,9 @@ const PhotoDetail: React.FC<Props> = ({ photoId }) => {
               />
             </div>
             <div className={styles.detailWrapper}>
+              <button type="button" className={styles.cancelButton} onClick={() => setSelectedPhoto(null)}>
+                <img src={cancelIcon} alt={cancelIcon} className={styles.cancelIcon} />
+              </button>
               <div className={styles.detailTop}>
                 <h3 className={styles.title}>{photoInfo.title}</h3>
                 <p className={styles.info}>

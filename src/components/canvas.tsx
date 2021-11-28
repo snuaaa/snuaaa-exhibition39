@@ -5,11 +5,13 @@ import { css } from '@emotion/css';
 
 import AaaThree from 'src/three/aaaThree';
 import { LinkName } from 'src/three/constants';
-import useScene from 'src/hooks/useScene';
 import { SCENE } from 'src/recoils/scene';
+import useScene from 'src/hooks/useScene';
+import useSelectedPhoto from 'src/hooks/useSelectedPhoto';
 
 const Canvas: React.FC = () => {
   const { scene, setScene } = useScene();
+  const { setSelectedPhoto } = useSelectedPhoto();
   const aaaThree = useRef<AaaThree>();
 
   const styles = useMemo(() => ({
@@ -44,10 +46,10 @@ const Canvas: React.FC = () => {
         }
       };
       aaaThree.current.onClickPhoto = (name) => {
-        console.log(name);
+        setSelectedPhoto(name);
       };
     }
-  }, [setScene]);
+  }, [setScene, setSelectedPhoto]);
 
   useEffect(() => {
     if (aaaThree.current) {
