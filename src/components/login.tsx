@@ -95,7 +95,7 @@ const Login: React.FC = () => {
   return (
     <>
       <div className={styles.wrapper}>
-        <h5 className={styles.title}>투표를 위해서는 구글 로그인이 필요합니다. 로그인 하시겠습니까?</h5>
+        <h5 className={styles.title}>기능을 사용하기 위해서는 구글 로그인이 필요합니다. 로그인 하시겠습니까?</h5>
         <p className={styles.text}>
           서울대학교 아마추어 천문회 AAA는 아래의 목적으로 개인정보를 수집 및 이용하며,
           개인 정보를 안전하게 취급하는데 최선을 다합니다.
@@ -108,7 +108,7 @@ const Login: React.FC = () => {
           이메일 주소 : 이벤트에 참여하실 때 당첨 시 연락을 위해 수집합니다.
           <br />
           <br />
-          수집된 개인정보는 사진전 전시와 이벤트가 모두 종료되는 2021.11.XX 이후로부터 N일 이내에 파기됩니다.
+          수집된 개인정보는 사진전 전시와 이벤트가 모두 종료되는 2021.12.14 이후로부터 30일 이내에 파기됩니다.
         </p>
         <div id="loginButton" className={styles.loginButton}>Login</div>
         <button type="button" className={styles.cancelButton} onClick={() => setScene(SCENE.HOME)}>뒤로가기</button>
