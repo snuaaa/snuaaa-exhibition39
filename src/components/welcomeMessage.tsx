@@ -1,11 +1,14 @@
 import React, { useMemo } from 'react';
 import { css, cx } from '@emotion/css';
-import { fadeIn } from 'src/styles/animation';
+import { fadeIn, fadeInOut } from 'src/styles/animation';
 import star from 'src/assets/images/star.png';
 import useWelcome from 'src/hooks/useWelcome';
+import useReady from 'src/hooks/useReady';
 
 const WelcomeMessage: React.FC = () => {
   const { hasViewed, setHasViewed } = useWelcome();
+  const { ready } = useReady();
+
   const styles = useMemo(() => ({
     wrapper: css({
       position: 'absolute',
@@ -46,6 +49,11 @@ const WelcomeMessage: React.FC = () => {
         borderColor: '#c874f2',
       },
     }),
+    loader: css({
+      animation: `${fadeInOut} 2s `,
+      animationTimingFunction: 'ease',
+      animationIterationCount: 'infinite',
+    }),
   }), [hasViewed]);
 
   return (
@@ -72,7 +80,11 @@ const WelcomeMessage: React.FC = () => {
           <br />
           - AAA 83대 회장 오종주
         </p>
-        <button className={styles.button} type="button" onClick={() => setHasViewed(true)}>사진전 입장하기</button>
+        {
+          ready
+            ? <button className={styles.button} type="button" onClick={() => setHasViewed(true)}>사진전 입장하기</button>
+            : <p className={cx([styles.text, styles.loader])}>Loading...</p>
+        }
       </div>
     </>
   );

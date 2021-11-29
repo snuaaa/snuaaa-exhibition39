@@ -8,10 +8,12 @@ import { LinkName, RoomName } from 'src/three/constants';
 import { SCENE } from 'src/recoils/scene';
 import useScene from 'src/hooks/useScene';
 import useSelectedPhoto from 'src/hooks/useSelectedPhoto';
+import useReady from 'src/hooks/useReady';
 
 const Canvas: React.FC = () => {
   const { scene, setScene } = useScene();
   const { setSelectedPhoto } = useSelectedPhoto();
+  const { setReady } = useReady();
   const aaaThree = useRef<AaaThree>();
 
   const styles = useMemo(() => ({
@@ -66,8 +68,11 @@ const Canvas: React.FC = () => {
       aaaThree.current.onClickPhoto = (name) => {
         setSelectedPhoto(name);
       };
+      aaaThree.current.onLoad = () => {
+        setReady(true);
+      };
     }
-  }, [setScene, setSelectedPhoto]);
+  }, [setScene, setSelectedPhoto, setReady]);
 
   useEffect(() => {
     if (aaaThree.current) {
