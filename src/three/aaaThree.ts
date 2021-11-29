@@ -30,6 +30,7 @@ const MODELS_TOWER = [
   'door_trail',
   'mvp',
   'newbie_project',
+  'star_falls',
   'floor',
 ];
 const MODELS_ROOM = [
