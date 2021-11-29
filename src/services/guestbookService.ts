@@ -1,15 +1,15 @@
 import BaseService from './index';
 import GuestBook from '../types/guestbook';
 
-const GeustbookService = {
+const GuestbookService = {
 
-  retrieve(page: number) {
-    return BaseService.get<GuestBook>('guestbook');
+  retrieve(page: number = 1) {
+    return BaseService.get<GuestBook[]>('guestbook');
   },
 
-  create(name: string, text: string) {
-    return BaseService.post('guestbook', { name, text });
+  create(text: string, nickname?: string) {
+    return BaseService.post('guestbook', { text, nickname });
   },
 };
 
-export default GeustbookService;
+export default GuestbookService;
