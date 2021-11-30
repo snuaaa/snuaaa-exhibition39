@@ -1,16 +1,16 @@
 import { useCallback, useEffect } from 'react';
-import { useRecoilState, useRecoilValue } from 'recoil';
+import { useRecoilState } from 'recoil';
 import authAtom from 'src/recoils/authAtom';
-import tokenAtom from 'src/recoils/tokenAtom';
 import AuthService from 'src/services/authService';
+import useToken from './useToken';
 
 const useAuth = () => {
-  const tokenValue = useRecoilValue(tokenAtom);
   const [auth, setAuth] = useRecoilState(authAtom);
+  const { getToken } = useToken();
 
   useEffect(() => {
     (async () => {
-      if (tokenValue) {
+      if (getToken()) {
         const { isMember, hasVoted } = await AuthService.getInfo();
         setAuth({
           isLogined: true,
@@ -19,7 +19,7 @@ const useAuth = () => {
         });
       }
     })();
-  }, [tokenValue, setAuth]);
+  }, [setAuth, getToken]);
 
   const authMember = useCallback(async (password: string) => {
     const { isMember, hasVoted } = await AuthService.authMember(password);
