@@ -283,7 +283,7 @@ class AaaThree {
   private loadRoomBackground() {
     return new Promise<void>((resolve, reject) => {
       const path = '/assets/models/room/background/';
-      const format = '.png';
+      const format = '.jpg';
       const urls = [
         `${path}px${format}`, `${path}nx${format}`,
         `${path}py${format}`, `${path}ny${format}`,
