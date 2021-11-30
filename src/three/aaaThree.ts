@@ -76,7 +76,7 @@ class AaaThree {
 
   public onClickLink: (name: string) => void = () => { };
 
-  public onClickPhoto: (photoId: string) => void = () => { };
+  public onClickPhoto: (modelName: string) => void = () => { };
 
   public onLoad: () => void = () => { };
 

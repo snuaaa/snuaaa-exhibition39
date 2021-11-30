@@ -14,10 +14,10 @@ import cancelIcon from 'src/assets/icons/cancel.svg';
 import useSelectedPhoto from 'src/hooks/useSelectedPhoto';
 
 type Props = {
-  photoId: string;
+  modelName: string;
 };
 
-const PhotoDetail: React.FC<Props> = ({ photoId }) => {
+const PhotoDetail: React.FC<Props> = ({ modelName }) => {
   const styles = useMemo(() => ({
     wrapper: css({
       position: 'absolute',
@@ -135,8 +135,8 @@ const PhotoDetail: React.FC<Props> = ({ photoId }) => {
   const { setSelectedPhoto } = useSelectedPhoto();
   const photoList = useRecoilValue(photoSelector);
   const photoInfo = useMemo(
-    () => photoList.find((photo) => photo.photo_id === photoId),
-    [photoId, photoList],
+    () => photoList.find((photo) => photo.model_name === modelName),
+    [modelName, photoList],
   );
 
   return (
@@ -149,7 +149,7 @@ const PhotoDetail: React.FC<Props> = ({ photoId }) => {
               <img
                 className={styles.img}
                 src={`${SERVER_URL}/static/${photoInfo.file_path}`}
-                alt={photoInfo.photo_id}
+                alt={photoInfo.model_name}
               />
             </div>
             <div className={styles.detailWrapper}>
@@ -170,7 +170,7 @@ const PhotoDetail: React.FC<Props> = ({ photoId }) => {
               <div className={styles.detailBottom}>
                 <p className={styles.info}>
                   <img className={styles.icon} src={dateIcon} alt="dateIcon" />
-                  {photoInfo.date.substr(0, 10)}
+                  {photoInfo.date}
                 </p>
                 <p className={styles.info}>
                   <img className={styles.icon} src={locationIcon} alt="locationIcon" />

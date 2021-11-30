@@ -11,7 +11,7 @@ const PhotoService = {
     return BaseService.get<Photo[]>('photo');
   },
 
-  vote(photo_id: string) {
+  vote(photo_id: number) {
     return BaseService.post('photo/vote', { photo_id });
   },
 };

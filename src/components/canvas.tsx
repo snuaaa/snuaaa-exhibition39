@@ -35,7 +35,7 @@ const Canvas: React.FC = () => {
       aaaThree.current.onClickLink = (name) => {
         switch (name) {
           case LinkName.INTRO:
-            window.location.replace('https://www.snuaaa.net/');
+            window.open('https://www.snuaaa.net/');
             break;
           case LinkName.MVP:
             setScene(SCENE.MVP);
@@ -65,8 +65,8 @@ const Canvas: React.FC = () => {
             break;
         }
       };
-      aaaThree.current.onClickPhoto = (name) => {
-        setSelectedPhoto(name);
+      aaaThree.current.onClickPhoto = (modelName) => {
+        setSelectedPhoto(modelName);
       };
       aaaThree.current.onLoad = () => {
         setReady(true);

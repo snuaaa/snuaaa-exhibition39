@@ -32,7 +32,7 @@ const Gallery: React.FC = () => {
         selectedPhoto
         && (
           <Suspense fallback={<div>loading.....</div>}>
-            <PhotoDetail photoId={selectedPhoto} />
+            <PhotoDetail modelName={selectedPhoto} />
           </Suspense>
         )
       }
