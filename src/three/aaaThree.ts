@@ -141,72 +141,71 @@ class AaaThree {
   }
 
   private enterHome() {
-    if (this.controls instanceof CustomControl) {
-      this.controls.dispose();
+    if (!(this.controls instanceof OrbitControls)) {
+      this.controls?.dispose();
+      this.camera.position.set(POSITION_HOME.x, POSITION_HOME.y, POSITION_HOME.z);
+      this.camera.rotation.set(0, 0, 0);
+
+      this.controls = new OrbitControls(this.camera, this.renderer.domElement);
+      // controls.listenToKeyEvents( window ); // optional
+
+      // an animation loop is required when either damping or auto-rotation are enabled
+      this.controls.enableDamping = true;
+      this.controls.dampingFactor = 0.05;
+
+      this.controls.screenSpacePanning = false;
+
+      this.controls.minDistance = 7;
+      this.controls.maxDistance = 15;
+
+      this.controls.maxPolarAngle = Math.PI / 2;
+      this.controls.target = new THREE.Vector3(0, 2, 0);
+      this.controls.update();
+
+      this.loadPromise.then(() => {
+        if (this.room) {
+          this.scene.remove(this.room);
+        }
+        if (this.tower) {
+          this.scene.add(this.tower);
+        }
+      });
+      this.scene.background = new THREE.Color('#101545');
+      this.scene.fog = new THREE.Fog(0x101545, 15, 25);
+
+      this.shootingStarInterval = window.setInterval(() => {
+        this.makeShootingStar();
+      }, SHOOTING_STAR_INTERVAL);
+      document.addEventListener('visibilitychange', this.onVisibilityChange);
     }
-    this.camera.position.set(POSITION_HOME.x, POSITION_HOME.y, POSITION_HOME.z);
-    this.camera.rotation.set(0, 0, 0);
-
-    this.controls = new OrbitControls(this.camera, this.renderer.domElement);
-    // controls.listenToKeyEvents( window ); // optional
-
-    // an animation loop is required when either damping or auto-rotation are enabled
-    this.controls.enableDamping = true;
-    this.controls.dampingFactor = 0.05;
-
-    this.controls.screenSpacePanning = false;
-
-    this.controls.minDistance = 7;
-    this.controls.maxDistance = 15;
-
-    this.controls.maxPolarAngle = Math.PI / 2;
-    this.controls.target = new THREE.Vector3(0, 2, 0);
-    this.controls.update();
-
-    this.loadPromise.then(() => {
-      if (this.room) {
-        this.scene.remove(this.room);
-      }
-      if (this.tower) {
-        this.scene.add(this.tower);
-      }
-    });
-    this.scene.background = new THREE.Color('#101545');
-    this.scene.fog = new THREE.Fog(0x101545, 15, 25);
-
-    this.shootingStarInterval = window.setInterval(() => {
-      this.makeShootingStar();
-    }, SHOOTING_STAR_INTERVAL);
-    document.addEventListener('visibilitychange', this.onVisibilityChange);
   }
 
   private enterGallery() {
-    if (this.tower) {
-      this.scene.remove(this.tower);
-    }
-    if (this.floor) {
-      this.scene.remove(this.floor);
-    }
-    if (this.roomBackground) {
-      this.scene.background = this.roomBackground;
-    }
-    this.room = this.makeRoom();
-    this.scene.add(this.room);
-    this.scene.fog = null;
-    if (this.controls instanceof OrbitControls) {
-      this.controls.dispose();
-    }
-    (window as any).camera = this.camera;
+    if (!(this.controls instanceof CustomControl)) {
+      this.controls?.dispose();
+      if (this.tower) {
+        this.scene.remove(this.tower);
+      }
+      if (this.floor) {
+        this.scene.remove(this.floor);
+      }
+      if (this.roomBackground) {
+        this.scene.background = this.roomBackground;
+      }
 
-    this.camera.position.set(POSITION_HOME.x, POSITION_HOME.y, POSITION_HOME.z);
-    this.camera.rotation.set(0, 0, 0);
-    const controls = new CustomControl(this.camera, this.renderer.domElement);
-    controls.connect();
+      this.room = this.makeRoom();
+      this.scene.add(this.room);
+      this.scene.fog = null;
+      (window as any).camera = this.camera;
 
-    document.removeEventListener('visibilitychange', this.onVisibilityChange);
-    window.clearInterval(this.shootingStarInterval);
-
-    this.controls = controls;
+      this.camera.position.set(POSITION_HOME.x, POSITION_HOME.y, POSITION_HOME.z);
+      this.camera.rotation.set(0, 0, 0);
+      const controls = new CustomControl(this.camera, this.renderer.domElement);
+      controls.connect();
+      document.removeEventListener('visibilitychange', this.onVisibilityChange);
+      window.clearInterval(this.shootingStarInterval);
+      this.controls = controls;
+    }
   }
 
   private onVisibilityChange = () => {
