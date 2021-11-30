@@ -6,7 +6,7 @@ import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
 
 import opentype from 'opentype.js';
 import { SCENE } from 'src/recoils/scene';
-import { APP_URL } from 'src/config';
+import { APP_URL, DEV_MODE } from 'src/config';
 import CustomControl from './customControl';
 import {
   makeBreathingBall, makeLights, makeRandom, makeWords,
@@ -98,6 +98,10 @@ class AaaThree {
 
   private loadResolve: () => void = () => { };
 
+  private get intersectionObjects() {
+    return [...this.linkObjects, ...this.photoModels];
+  }
+
   constructor() {
     const fov = window.innerWidth > 800 ? 50 : 70;
     this.camera = new THREE.PerspectiveCamera(
@@ -136,16 +140,16 @@ class AaaThree {
         targetElement.addEventListener('mousemove', (e) => this.onMouseMove(e), false);
         targetElement.addEventListener('click', () => this.onMouseClick());
 
-        targetElement.appendChild(this.stats.dom);
+        if (DEV_MODE) {
+          targetElement.appendChild(this.stats.dom);
+        }
       });
   }
 
   private enterHome() {
+    document.body.style.cursor = 'grab';
     if (!(this.controls instanceof OrbitControls)) {
       this.controls?.dispose();
-      this.camera.position.set(POSITION_HOME.x, POSITION_HOME.y, POSITION_HOME.z);
-      this.camera.rotation.set(0, 0, 0);
-
       this.controls = new OrbitControls(this.camera, this.renderer.domElement);
       // controls.listenToKeyEvents( window ); // optional
 
@@ -178,9 +182,12 @@ class AaaThree {
       }, SHOOTING_STAR_INTERVAL);
       document.addEventListener('visibilitychange', this.onVisibilityChange);
     }
+    this.camera.position.set(POSITION_HOME.x, POSITION_HOME.y, POSITION_HOME.z);
+    this.camera.rotation.set(0, 0, 0);
   }
 
   private enterGallery() {
+    document.body.style.cursor = 'grab';
     if (!(this.controls instanceof CustomControl)) {
       this.controls?.dispose();
       if (this.tower) {
@@ -379,7 +386,7 @@ class AaaThree {
                 });
                 mesh.addEventListener('mouseout', () => {
                   word.visible = false;
-                  document.body.style.cursor = 'default';
+                  document.body.style.cursor = 'grab';
                 });
               }
             });
@@ -416,7 +423,7 @@ class AaaThree {
               document.body.style.cursor = 'pointer';
             });
             child.addEventListener('mouseout', () => {
-              document.body.style.cursor = 'default';
+              document.body.style.cursor = 'grab';
             });
           }
         }
@@ -480,7 +487,9 @@ class AaaThree {
   public animate() {
     requestAnimationFrame(this.animate.bind(this));
     // this.controls?.update();
-    this.stats.update();
+    if (DEV_MODE) {
+      this.stats.update();
+    }
     this.renderer.render(this.scene, this.camera);
   }
 
@@ -492,7 +501,7 @@ class AaaThree {
     mouseRayCaster.setFromCamera(this.mouse, this.camera);
     mouseRayCaster.far = 100;
 
-    const intersects = mouseRayCaster.intersectObjects([...this.linkObjects, ...this.photoModels]);
+    const intersects = mouseRayCaster.intersectObjects(this.intersectionObjects);
     if (intersects && intersects[0] && intersects[0].object instanceof THREE.Mesh) {
       const { object } = intersects[0];
       if (!object.userData.isMouseEnter) {
@@ -502,7 +511,7 @@ class AaaThree {
         });
       }
     } else {
-      const object = this.linkObjects.find((_object) => _object.userData.isMouseEnter);
+      const object = this.intersectionObjects.find((_object) => _object.userData.isMouseEnter);
       if (object) {
         object.userData.isMouseEnter = false;
         object.dispatchEvent({
@@ -517,7 +526,7 @@ class AaaThree {
     mouseRayCaster.setFromCamera(this.mouse, this.camera);
     mouseRayCaster.far = 100;
 
-    const intersects = mouseRayCaster.intersectObjects([...this.linkObjects, ...this.photoModels]);
+    const intersects = mouseRayCaster.intersectObjects(this.intersectionObjects);
     if (intersects && intersects[0] && intersects[0].object instanceof THREE.Mesh) {
       const { object } = intersects[0];
       object.dispatchEvent({
