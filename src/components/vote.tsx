@@ -1,7 +1,7 @@
 /* eslint-disable jsx-a11y/label-has-associated-control */
 import React, {
   ChangeEvent,
-  Fragment, useCallback, useMemo, useState,
+  Fragment, useCallback, useEffect, useMemo, useState,
 } from 'react';
 import { css } from '@emotion/css';
 import { useRecoilValue } from 'recoil';
@@ -11,7 +11,9 @@ import checker from 'src/assets/images/checker.png';
 import submitIcon from 'src/assets/icons/submit.svg';
 import cancelIcon from 'src/assets/icons/cancel.svg';
 import useAuth from 'src/hooks/useAuth';
+import useToken from 'src/hooks/useToken';
 import PhotoService from 'src/services/photoService';
+import AuthService from 'src/services/authService';
 
 const styles = {
   wrapper: css({
@@ -142,13 +144,13 @@ const styles = {
 const Vote: React.FC = () => {
   const photoList = useRecoilValue(photo);
   const memberCheckerId = 'memberChecker';
-  const [selectedPhoto, setSelectedPhoto] = useState<string | null>(null);
+  const [selectedPhoto, setSelectedPhoto] = useState<number | null>(null);
   const [memberChecker, setMemberChecker] = useState<boolean>(false);
   const [password, setPassword] = useState<string>('');
   const { auth, setAuth, authMember } = useAuth();
-  const { isMember } = auth;
+  const { getToken } = useToken();
 
-  const onClickPhoto = useCallback((photoId: string) => {
+  const onClickPhoto = useCallback((photoId: number) => {
     if (photoId === selectedPhoto) {
       setSelectedPhoto(null);
     } else {
@@ -180,7 +182,23 @@ const Vote: React.FC = () => {
     }
   }, [selectedPhoto, auth, setAuth]);
 
-  const isMemberChecking = useMemo(() => !isMember && memberChecker, [memberChecker, isMember]);
+  const isMemberChecking = useMemo(() => !auth.isMember && memberChecker, [memberChecker, auth]);
+
+  useEffect(() => {
+    if (getToken()) {
+      AuthService.getInfo()
+        .then(({ isMember, hasVoted }) => {
+          setAuth({
+            isLogined: true,
+            isMember,
+            hasVoted,
+          });
+        })
+        .catch((err) => {
+          console.error(err);
+        });
+    }
+  }, [setAuth, getToken]);
 
   return (
     <>
@@ -235,7 +253,7 @@ const Vote: React.FC = () => {
             : (
               <>
                 <div className={styles.memberCheck}>
-                  <input id={memberCheckerId} type="checkbox" className={styles.memberCheckInput} checked={isMember} onChange={onClickMemberChecker} />
+                  <input id={memberCheckerId} type="checkbox" className={styles.memberCheckInput} checked={auth.isMember} onChange={onClickMemberChecker} />
                   <label htmlFor={memberCheckerId} className={styles.memberCheckLabel}>
                     나는 AAA회원입니다.
                   </label>
