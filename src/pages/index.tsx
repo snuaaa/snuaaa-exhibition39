@@ -6,6 +6,7 @@ import Gallery from 'src/components/gallery';
 import Guestbook from 'src/components/guestbook';
 import NewbieProject from 'src/components/newbieProject';
 import Canvas from 'src/components/canvas';
+import Music from 'src/components/music';
 import useScene from 'src/hooks/useScene';
 import { SCENE } from 'src/recoils/scene';
 
@@ -35,6 +36,7 @@ const Page: React.FC = () => {
     <>
       <Canvas />
       {switchScene()}
+      <Music />
     </>
   );
 };
