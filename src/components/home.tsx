@@ -22,7 +22,7 @@ const styles = {
     animationDelay: '0.5s',
     animationFillMode: 'both',
     '@media screen and (max-width: 800px)': {
-      width: '100%',
+      width: '50%',
     },
   }),
   buttonWrapper: css({

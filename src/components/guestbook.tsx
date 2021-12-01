@@ -25,6 +25,7 @@ const styles = {
   loginWrapper: css({
     background: 'rgba(72, 81, 138, 0.4)',
     borderRadius: '3rem',
+    margin: '1rem',
   }),
 };
 

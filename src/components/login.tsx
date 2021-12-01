@@ -18,10 +18,16 @@ const Login: React.FC = () => {
       flexDirection: 'column',
       justifyContent: 'center',
       alignItems: 'center',
+      '@media screen and (max-width: 800px)': {
+        padding: '1rem 3rem',
+      },
     }),
     title: css({
       fontSize: '1.2rem',
       textAlign: 'center',
+      '@media screen and (max-width: 800px)': {
+        fontSize: '1rem',
+      },
     }),
     text: css({
       fontSize: '0.8rem',

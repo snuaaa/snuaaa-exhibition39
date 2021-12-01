@@ -33,7 +33,7 @@ const styles = {
     animationFillMode: 'both',
   }),
   textWrapper: css({
-    width: '50rem',
+    width: '50%',
     padding: '1rem',
     borderRadius: '2rem',
     background: 'rgba(172, 58, 99, 0.7)',
@@ -41,6 +41,16 @@ const styles = {
     display: 'flex',
     flexDirection: 'column',
     alignItems: 'center',
+    '@media screen and (max-width: 1200px)': {
+      width: '60%',
+    },
+    '@media screen and (max-width: 1000px)': {
+      width: '80%',
+    },
+    '@media screen and (max-width: 800px)': {
+      width: '90%',
+      padding: 0,
+    },
   }),
   text: css({
     textAlign: 'center',
@@ -49,6 +59,9 @@ const styles = {
     fontSize: '2rem',
     lineHeight: 1.5,
     animation: `${fadeIn} 1s`,
+    '@media screen and (max-width: 800px)': {
+      fontSize: '1.3rem',
+    },
   }),
   button: css({
     width: '10rem',

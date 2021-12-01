@@ -17,6 +17,8 @@ import PhotoService from 'src/services/photoService';
 import AuthService from 'src/services/authService';
 import { SCENE } from 'src/recoils/scene';
 
+const gradientSize = '3rem';
+
 const styles = {
   wrapper: css({
     height: '100%',
@@ -33,14 +35,6 @@ const styles = {
     justifyContent: 'center',
     position: 'relative',
     width: '100%',
-    '&::after': {
-      position: 'absolute',
-      bottom: '-5rem',
-      height: '10rem',
-      width: '100%',
-      background: 'linear-gradient(180deg, rgb(80 81 113 / 0%) 0%, rgb(34 38 112) 50%, rgb(80 81 113 / 0%) 100%)',
-      content: '""',
-    },
   }),
   scrollArea: css({
     display: 'flex',
@@ -50,13 +44,22 @@ const styles = {
     justifyContent: 'center',
     overflowY: 'scroll',
     paddingBottom: '5rem',
+    maskImage: `linear-gradient(to bottom, transparent, #000000 ${gradientSize}, #000000 calc(100% - ${gradientSize}), transparent 100% ), linear-gradient(#000000, #000000)`,
+    maskRepeat: 'no-repeat, no-repeat',
+    maskSize: 'auto 100%, auto 0',
+    maskPosition: 'left, right',
     '&::-webkit-scrollbar': {
       display: 'none',
+    },
+    '@media screen and (max-width: 800px)': {
+      width: '100%',
+      padding: '0 0.5rem',
     },
   }),
   thumbnail: css({
     height: '8rem',
     cursor: 'pointer',
+    display: 'block',
   }),
   selectedThumbnail: css({
     borderColor: '#AC3A63',
