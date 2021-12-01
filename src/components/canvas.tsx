@@ -1,5 +1,5 @@
 import React, {
-  useCallback, useEffect, useMemo, useRef,
+  useCallback, useEffect, useMemo, useRef, useState,
 } from 'react';
 import { css, cx } from '@emotion/css';
 
@@ -19,6 +19,10 @@ const Canvas: React.FC = () => {
   const { setSelectedPhoto } = useSelectedPhoto();
   const { setReady } = useReady();
   const aaaThree = useRef<AaaThree>();
+  const [moveLeft, setMoveLeft] = useState(false);
+  const [moveRight, setMoveRight] = useState(false);
+  const [moveForward, setMoveForward] = useState(false);
+  const [moveBackward, setMoveBackward] = useState(false);
 
   const styles = useMemo(() => ({
     wrapper: css({
@@ -122,29 +126,27 @@ const Canvas: React.FC = () => {
     }
   }, [scene, aaaThree]);
 
-  const onClickLeft = useCallback(() => {
-    if (aaaThree.current) {
-      aaaThree.current.moveLeft();
-    }
-  }, []);
-
-  const onClickRight = useCallback(() => {
-    if (aaaThree.current) {
-      aaaThree.current.moveRight();
-    }
-  }, []);
-
-  const onClickForward = useCallback(() => {
-    if (aaaThree.current) {
-      aaaThree.current.moveForward();
-    }
-  }, []);
-
-  const onClickBackword = useCallback(() => {
-    if (aaaThree.current) {
-      aaaThree.current.moveBackward();
-    }
-  }, []);
+  useEffect(() => {
+    const interval = window.setInterval(() => {
+      if (aaaThree.current) {
+        if (moveLeft) {
+          aaaThree.current.moveLeft();
+        }
+        if (moveRight) {
+          aaaThree.current.moveRight();
+        }
+        if (moveForward) {
+          aaaThree.current.moveForward();
+        }
+        if (moveBackward) {
+          aaaThree.current.moveBackward();
+        }
+      }
+    }, 30);
+    return () => {
+      window.clearInterval(interval);
+    };
+  }, [moveLeft, moveRight, moveForward, moveBackward]);
 
   return (
     <div className={styles.wrapper}>
@@ -152,17 +154,53 @@ const Canvas: React.FC = () => {
         scene === SCENE.GALLERY
         && (
           <div className={styles.joystick}>
-            <button type="button" className={cx([styles.iconButton, styles.leftIconButton])} onClick={onClickLeft}>
-              <img src={leftIcon} alt="leftIcon" className={styles.icon} />
+            <button
+              type="button"
+              className={cx([styles.iconButton, styles.leftIconButton])}
+              onTouchStart={() => setMoveLeft(true)}
+              onTouchEnd={() => setMoveLeft(false)}
+              onMouseDown={() => setMoveLeft(true)}
+              onMouseUp={() => setMoveLeft(false)}
+              onMouseOut={() => setMoveLeft(false)}
+              onBlur={() => setMoveLeft(false)}
+            >
+              <img src={leftIcon} alt="leftIcon" className={styles.icon} onContextMenu={(e) => e.preventDefault()} />
             </button>
-            <button type="button" className={cx([styles.iconButton, styles.rightIconButton])} onClick={onClickRight}>
-              <img src={rightIcon} alt="rightIcon" className={styles.icon} />
+            <button
+              type="button"
+              className={cx([styles.iconButton, styles.rightIconButton])}
+              onTouchStart={() => setMoveRight(true)}
+              onTouchEnd={() => setMoveRight(false)}
+              onMouseDown={() => setMoveRight(true)}
+              onMouseUp={() => setMoveRight(false)}
+              onMouseOut={() => setMoveRight(false)}
+              onBlur={() => setMoveRight(false)}
+            >
+              <img src={rightIcon} alt="rightIcon" className={styles.icon} onContextMenu={(e) => e.preventDefault()} />
             </button>
-            <button type="button" className={cx([styles.iconButton, styles.forwardIconButton])} onClick={onClickForward}>
-              <img src={forwardIcon} alt="frontIcon" className={styles.icon} />
+            <button
+              type="button"
+              className={cx([styles.iconButton, styles.forwardIconButton])}
+              onTouchStart={() => setMoveForward(true)}
+              onTouchEnd={() => setMoveForward(false)}
+              onMouseDown={() => setMoveForward(true)}
+              onMouseUp={() => setMoveForward(false)}
+              onMouseOut={() => setMoveForward(false)}
+              onBlur={() => setMoveForward(false)}
+            >
+              <img src={forwardIcon} alt="frontIcon" className={styles.icon} onContextMenu={(e) => e.preventDefault()} />
             </button>
-            <button type="button" className={cx([styles.iconButton, styles.backwardIconButton])} onClick={onClickBackword}>
-              <img src={backwardIcon} alt="backIcon" className={styles.icon} />
+            <button
+              type="button"
+              className={cx([styles.iconButton, styles.backwardIconButton])}
+              onTouchStart={() => setMoveBackward(true)}
+              onTouchEnd={() => setMoveBackward(false)}
+              onMouseDown={() => setMoveBackward(true)}
+              onMouseUp={() => setMoveBackward(false)}
+              onMouseOut={() => setMoveBackward(false)}
+              onBlur={() => setMoveBackward(false)}
+            >
+              <img src={backwardIcon} alt="backIcon" className={styles.icon} onContextMenu={(e) => e.preventDefault()} />
             </button>
           </div>
         )
