@@ -4,6 +4,7 @@ import Intro from 'src/components/intro';
 import MVP from 'src/components/mvp';
 import Gallery from 'src/components/gallery';
 import Guestbook from 'src/components/guestbook';
+import NewbieProject from 'src/components/newbieProject';
 import Canvas from 'src/components/canvas';
 import useScene from 'src/hooks/useScene';
 import { SCENE } from 'src/recoils/scene';
@@ -23,6 +24,8 @@ const Page: React.FC = () => {
         return <Gallery />;
       case SCENE.GUESTBOOK:
         return <Guestbook />;
+      case SCENE.NEWBIE_PROJECT:
+        return <NewbieProject />;
       default:
         return <Home />;
     }

@@ -6,6 +6,7 @@ export enum SCENE {
   GALLERY,
   MVP,
   GUESTBOOK,
+  NEWBIE_PROJECT,
 }
 
 const sceneState = atom({
