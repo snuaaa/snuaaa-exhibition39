@@ -1,7 +1,7 @@
 import * as THREE from 'three';
 import Stats from 'three/examples/jsm/libs/stats.module';
 import { GLTF, GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader';
-import { DRACOLoader } from 'three/examples/jsm/loaders/DRACOLoader';
+// import { DRACOLoader } from 'three/examples/jsm/loaders/DRACOLoader';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
 
 import opentype from 'opentype.js';
@@ -92,6 +92,8 @@ class AaaThree {
 
   private floor?: THREE.Object3D;
 
+  private towerBackground?: THREE.CubeTexture;
+
   private roomBackground?: THREE.CubeTexture;
 
   private loadPromise: Promise<void>;
@@ -174,8 +176,11 @@ class AaaThree {
           this.scene.add(this.tower);
         }
       });
-      this.scene.background = new THREE.Color('#101545');
-      this.scene.fog = new THREE.Fog(0x101545, 15, 25);
+      // this.scene.background = new THREE.Color('#101545');
+      if (this.towerBackground) {
+        this.scene.background = this.towerBackground;
+      }
+      this.scene.fog = new THREE.Fog(0x090f27, 15, 25);
 
       this.shootingStarInterval = window.setInterval(() => {
         this.makeShootingStar();
@@ -215,6 +220,30 @@ class AaaThree {
     }
   }
 
+  public moveLeft() {
+    if (this.controls instanceof CustomControl) {
+      this.controls.moveRight(-0.5);
+    }
+  }
+
+  public moveRight() {
+    if (this.controls instanceof CustomControl) {
+      this.controls.moveRight(0.5);
+    }
+  }
+
+  public moveForward() {
+    if (this.controls instanceof CustomControl) {
+      this.controls.moveForward(0.5);
+    }
+  }
+
+  public moveBackward() {
+    if (this.controls instanceof CustomControl) {
+      this.controls.moveForward(-0.5);
+    }
+  }
+
   private onVisibilityChange = () => {
     if (document.visibilityState === 'hidden') {
       window.clearInterval(this.shootingStarInterval);
@@ -227,13 +256,18 @@ class AaaThree {
 
   private async load() {
     await this.loadFont();
-    this.towerModels = await Promise.all(
+    await Promise.all(
       MODELS_TOWER.map((modelName) => this.loadTower(modelName)),
-    );
-    this.roomModels = await Promise.all(
+    ).then((models) => {
+      this.towerModels = models;
+    });
+    await Promise.all(
       MODELS_ROOM.map((modelName) => this.loadRoom(modelName)),
-    );
+    ).then((models) => {
+      this.roomModels = models;
+    });
     await this.loadRoomBackground();
+    await this.loadTowerBackground();
     this.loadResolve();
     this.onLoad();
   }
@@ -256,11 +290,14 @@ class AaaThree {
     const texture = await new THREE.TextureLoader().loadAsync(`/assets/models/home/${modelName}.jpg`);
     texture.flipY = false;
     // texture.encoding = THREE.sRGBEncoding;
-    const dracoLoader = new DRACOLoader();
-    dracoLoader.setDecoderPath('/draco/');
+    // const dracoLoader = new DRACOLoader();
+    // dracoLoader.setDecoderPath('/draco/');
+    // dracoLoader.setDecoderConfig({
+    //   type: 'js',
+    // });
 
     const gltfLoader = new GLTFLoader();
-    gltfLoader.setDRACOLoader(dracoLoader);
+    // gltfLoader.setDRACOLoader(dracoLoader);
     const gltf = await gltfLoader.loadAsync(`/assets/models/home/${modelName}.glb`);
     return {
       gltf,
@@ -274,11 +311,14 @@ class AaaThree {
     const texture = await new THREE.TextureLoader().loadAsync(`/assets/models/room/${modelName}.jpg`);
     texture.flipY = false;
     // texture.encoding = THREE.sRGBEncoding;
-    const dracoLoader = new DRACOLoader();
-    dracoLoader.setDecoderPath('/draco/');
+    // const dracoLoader = new DRACOLoader();
+    // dracoLoader.setDecoderPath('/draco/');
+    // dracoLoader.setDecoderConfig({
+    //   type: 'js',
+    // });
 
     const gltfLoader = new GLTFLoader();
-    gltfLoader.setDRACOLoader(dracoLoader);
+    // gltfLoader.setDRACOLoader(dracoLoader);
     const gltf = await gltfLoader.loadAsync(`/assets/models/room/${modelName}.glb`);
     return {
       gltf,
@@ -287,14 +327,41 @@ class AaaThree {
     };
   }
 
+  private loadTowerBackground() {
+    return new Promise<void>((resolve, reject) => {
+      const path = '/assets/models/home/background/';
+      const format = '.jpg';
+      const urls = [
+        `${path}px${format}`,
+        `${path}nx${format}`,
+        `${path}py${format}`,
+        `${path}ny${format}`,
+        `${path}pz${format}`,
+        `${path}nz${format}`,
+      ];
+
+      new THREE.CubeTextureLoader().load(urls, (texture) => {
+        this.towerBackground = texture;
+        resolve();
+      }, () => {
+
+      }, (err) => {
+        reject(err);
+      });
+    });
+  }
+
   private loadRoomBackground() {
     return new Promise<void>((resolve, reject) => {
       const path = '/assets/models/room/background/';
       const format = '.jpg';
       const urls = [
-        `${path}px${format}`, `${path}nx${format}`,
-        `${path}py${format}`, `${path}ny${format}`,
-        `${path}pz${format}`, `${path}nz${format}`,
+        `${path}px${format}`,
+        `${path}nx${format}`,
+        `${path}py${format}`,
+        `${path}ny${format}`,
+        `${path}pz${format}`,
+        `${path}nz${format}`,
       ];
 
       new THREE.CubeTextureLoader().load(urls, (texture) => {

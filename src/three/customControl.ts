@@ -92,28 +92,28 @@ class CustomControl extends EventDispatcher {
     this.dispatchEvent(changeEvent);
   }
 
-  private onTouchStart(e: TouchEvent) {
+  private touchStartHandler = (e: TouchEvent) => {
     // e.preventDefault();
     this.mouseX = e.touches[0].clientX;
     this.mouseY = e.touches[0].clientY;
     this.isRotating = true;
-  }
+  };
 
-  private onTouchEnd(e: TouchEvent) {
+  private touchEndHandler = (e: TouchEvent) => {
     // e.preventDefault();
     this.isRotating = false;
-  }
+  };
 
-  private onTouchMove(e: TouchEvent) {
+  private touchMoveHandler = (e: TouchEvent) => {
     // e.preventDefault();
     if (e.touches[0]) {
       if (this.isRotating) {
-        // AaaThree.addRotation(mouseX - e.touches[0].clientX);
-        this.rotate(this.mouseX - e.touches[0].clientX, 0);
+        this.rotate(this.mouseX - e.touches[0].clientX, this.mouseY - e.touches[0].clientY);
       }
       this.mouseX = e.touches[0].clientX;
+      this.mouseY = e.touches[0].clientY;
     }
-  }
+  };
 
   private onPointerlockChange() {
     if (this.domElement.ownerDocument.pointerLockElement === this.domElement) {
@@ -190,6 +190,11 @@ class CustomControl extends EventDispatcher {
     this.domElement.addEventListener('mouseup', this.mouseUpEventHandler);
     this.domElement.addEventListener('mousemove', this.mouseMoveEventHandler);
     this.domElement.addEventListener('mouseout', this.mouseOutHandler);
+
+    this.domElement.addEventListener('touchstart', this.touchStartHandler);
+    this.domElement.addEventListener('touchend', this.touchEndHandler);
+    this.domElement.addEventListener('touchmove', this.touchMoveHandler);
+
     document.addEventListener('keydown', this.keyDownHandler);
   }
 
@@ -201,6 +206,11 @@ class CustomControl extends EventDispatcher {
     this.domElement.removeEventListener('mouseup', this.mouseUpEventHandler);
     this.domElement.removeEventListener('mousemove', this.mouseMoveEventHandler);
     this.domElement.removeEventListener('mouseout', this.mouseOutHandler);
+
+    this.domElement.removeEventListener('touchstart', this.touchStartHandler);
+    this.domElement.removeEventListener('touchend', this.touchEndHandler);
+    this.domElement.removeEventListener('touchmove', this.touchMoveHandler);
+
     document.removeEventListener('keydown', this.keyDownHandler);
   }
 
@@ -215,11 +225,8 @@ class CustomControl extends EventDispatcher {
   public moveForward(distance: number) {
     // move forward parallel to the xz-plane
     // assumes camera.up is y-up
-
     this.vector.setFromMatrixColumn(this.camera.matrix, 0);
-
     this.vector.crossVectors(this.camera.up, this.vector);
-
     this.camera.position.addScaledVector(this.vector, distance);
   }
 
