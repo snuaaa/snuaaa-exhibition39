@@ -12,8 +12,10 @@ import submitIcon from 'src/assets/icons/submit.svg';
 import cancelIcon from 'src/assets/icons/cancel.svg';
 import useAuth from 'src/hooks/useAuth';
 import useToken from 'src/hooks/useToken';
+import useScene from 'src/hooks/useScene';
 import PhotoService from 'src/services/photoService';
 import AuthService from 'src/services/authService';
+import { SCENE } from 'src/recoils/scene';
 
 const styles = {
   wrapper: css({
@@ -142,7 +144,19 @@ const styles = {
       cursor: 'not-allowed',
       color: '#AAAAAA',
       borderColor: '#AAAAAA',
-      // backgroundColor: 'rgb(110, 110, 110, 0.5)',
+    },
+  }),
+  backButton: css({
+    marginTop: '1rem',
+    width: '10rem',
+    padding: '0.5rem 1.5rem',
+    color: '#FFFFFF',
+    fontFamily: 'IM_Hyemin-Regular',
+    background: 'transparent',
+    cursor: 'pointer',
+    transition: 'all ease 0.3s',
+    '&:hover': {
+      color: '#c874f2',
     },
   }),
 };
@@ -156,6 +170,7 @@ const Vote: React.FC = () => {
   const [password, setPassword] = useState<string>('');
   const { auth, setAuth, authMember } = useAuth();
   const { getToken } = useToken();
+  const { setScene } = useScene();
 
   const onClickPhoto = useCallback((photoId: number) => {
     if (photoId === selectedPhoto) {
@@ -189,6 +204,10 @@ const Vote: React.FC = () => {
     }
   }, [selectedPhoto, auth, setAuth]);
 
+  const onClickBackButton = useCallback(() => {
+    setScene(SCENE.HOME);
+  }, [setScene]);
+
   const isMemberChecking = useMemo(() => !auth.isMember && memberChecker, [memberChecker, auth]);
 
   useEffect(() => {
@@ -217,31 +236,33 @@ const Vote: React.FC = () => {
         <div className={styles.scrollAreaWrapper}>
           <div className={styles.scrollArea}>
             {
-              photoList.map((_photo) => {
-                const photoId = `photo${_photo.photo_id}`;
-                return (
-                  <Fragment key={`thumbnail_${_photo.photo_id}`}>
-                    <input
-                      type="radio"
-                      name="mvpPhoto"
-                      id={photoId}
-                      className={styles.input}
-                      checked={selectedPhoto === _photo.photo_id}
-                      onChange={() => onClickPhoto(_photo.photo_id)}
-                    />
-                    <label
-                      htmlFor={photoId}
-                      className={styles.label}
-                    >
-                      <img
-                        className={styles.thumbnail}
-                        src={`${SERVER_URL}/static/${_photo.thumbnail_path}`}
-                        alt={`thumbnail_${_photo.photo_id}`}
+              photoList
+                .filter((_photo) => _photo.can_be_voted)
+                .map((_photo) => {
+                  const photoId = `photo${_photo.photo_id}`;
+                  return (
+                    <Fragment key={`thumbnail_${_photo.photo_id}`}>
+                      <input
+                        type="radio"
+                        name="mvpPhoto"
+                        id={photoId}
+                        className={styles.input}
+                        checked={selectedPhoto === _photo.photo_id}
+                        onChange={() => onClickPhoto(_photo.photo_id)}
                       />
-                    </label>
-                  </Fragment>
-                );
-              })
+                      <label
+                        htmlFor={photoId}
+                        className={styles.label}
+                      >
+                        <img
+                          className={styles.thumbnail}
+                          src={`${SERVER_URL}/static/${_photo.thumbnail_path}`}
+                          alt={`thumbnail_${_photo.photo_id}`}
+                        />
+                      </label>
+                    </Fragment>
+                  );
+                })
             }
           </div>
         </div>
@@ -271,6 +292,9 @@ const Vote: React.FC = () => {
                 </div>
                 <button type="button" className={styles.submitButton} onClick={submit} disabled={!selectedPhoto}>
                   투표하기
+                </button>
+                <button type="button" className={styles.backButton} onClick={onClickBackButton}>
+                  뒤로가기
                 </button>
               </>
             )
