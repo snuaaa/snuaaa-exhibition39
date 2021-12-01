@@ -43,14 +43,14 @@ export const mapRoomToCamera = (room: RoomName) => {
   const map = {
     [RoomName.STAR]: {
       position: {
-        x: 193,
+        x: 207,
         y: -130,
-        z: -180,
+        z: -185,
       },
       rotation: {
-        x: 0,
-        y: -1.06,
-        z: 0,
+        x: 0.0023,
+        y: -1.044,
+        z: 0.002,
       },
     },
     [RoomName.TRAIL]: {
