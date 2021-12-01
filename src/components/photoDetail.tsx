@@ -146,11 +146,24 @@ const PhotoDetail: React.FC<Props> = ({ modelName }) => {
         && (
           <div className={styles.wrapper}>
             <div className={styles.imgWrapper}>
-              <img
-                className={styles.img}
-                src={`${SERVER_URL}/static/${photoInfo.file_path}`}
-                alt={photoInfo.model_name}
-              />
+              {
+                photoInfo.is_video
+                  ? (
+                    // eslint-disable-next-line jsx-a11y/media-has-caption
+                    <video
+                      className={styles.img}
+                      autoPlay
+                      src={`${SERVER_URL}/static/${photoInfo.file_path}`}
+                    />
+                  )
+                  : (
+                    <img
+                      className={styles.img}
+                      src={`${SERVER_URL}/static/${photoInfo.file_path}`}
+                      alt={photoInfo.model_name}
+                    />
+                  )
+              }
             </div>
             <div className={styles.detailWrapper}>
               <button type="button" className={styles.cancelButton} onClick={() => setSelectedPhoto(null)}>
