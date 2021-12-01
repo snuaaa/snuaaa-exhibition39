@@ -141,7 +141,7 @@ type Props = {
 };
 
 const Intro: React.FC<Props> = ({ skip }) => {
-  const [index, setIndex] = useState<number>(4);
+  const [index, setIndex] = useState<number>(0);
 
   useEffect(() => {
     let timeout: number = 0;
