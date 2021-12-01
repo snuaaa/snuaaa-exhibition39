@@ -2,18 +2,19 @@ import React, { useCallback, useEffect, useRef } from 'react';
 import { css } from '@emotion/css';
 
 import AaaThree from 'src/three/aaaThree';
-import slogan from 'src/assets/images/slogan.svg';
+import slogan from 'src/assets/images/slogan.png';
 import useScene from 'src/hooks/useScene';
 import useWelcome from 'src/hooks/useWelcome';
 import guestbookIcon from 'src/assets/icons/guestbook.svg';
+import voteIcon from 'src/assets/icons/vote.svg';
 import { SCENE } from 'src/recoils/scene';
 import WelcomeMessage from './welcomeMessage';
 
 const styles = {
   slogan: css({
     position: 'absolute',
-    top: 0,
-    right: 0,
+    top: '2rem',
+    right: '2rem',
     // height: 300,
     maxWidth: 1000,
     width: '25%',
@@ -35,7 +36,7 @@ const styles = {
     background: 'none',
   }),
   icon: css({
-    width: '4rem',
+    width: '3rem',
   }),
   canvas: css({
     userSelect: 'none',
@@ -57,12 +58,19 @@ const Home: React.FC = () => {
     setScene(SCENE.GUESTBOOK);
   }, [setScene]);
 
+  const onClickMVP = useCallback(() => {
+    setScene(SCENE.MVP);
+  }, [setScene]);
+
   return (
     <>
       <img className={styles.slogan} src={slogan} alt="for the STARved" />
       <div className={styles.buttonWrapper}>
         <button type="button" className={styles.button} onClick={onClickGuestBook}>
           <img src={guestbookIcon} alt="guestbookIcon" className={styles.icon} />
+        </button>
+        <button type="button" className={styles.button} onClick={onClickMVP}>
+          <img src={voteIcon} alt="voteIcon" className={styles.icon} />
         </button>
       </div>
       {

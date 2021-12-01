@@ -1,9 +1,10 @@
 import React, { useMemo } from 'react';
 import { css, cx } from '@emotion/css';
 import { fadeIn, fadeInOut } from 'src/styles/animation';
-import star from 'src/assets/images/star.png';
 import useWelcome from 'src/hooks/useWelcome';
 import useReady from 'src/hooks/useReady';
+import slogan from 'src/assets/images/slogan.png';
+import background from 'src/assets/images/background_star.png';
 
 const WelcomeMessage: React.FC = () => {
   const { hasViewed, setHasViewed } = useWelcome();
@@ -15,7 +16,9 @@ const WelcomeMessage: React.FC = () => {
       top: 0,
       height: '100%',
       width: '100%',
-      background: 'linear-gradient(180deg, rgba(12, 13, 45, 0.9) 0%, rgba(9, 18, 65, 0.9) 68.23%, rgba(26, 34, 115, 0.9) 81.25%, rgba(85, 39, 122, 0.9) 94.27%)',
+      backgroundImage: `url(${background})`,
+      backgroundColor: 'rgba(0, 0, 0, 0.7)',
+      opacity: '0.4',
       display: !hasViewed ? 'flex' : 'none',
       flexDirection: 'column',
       justifyContent: 'center',
@@ -35,7 +38,7 @@ const WelcomeMessage: React.FC = () => {
       marginBottom: '4rem',
       animation: `${fadeIn} 1s`,
       '@media screen and (max-width: 800px)': {
-        width: '90%',
+        width: '80%',
         fontSize: '0.9rem',
       },
     }),
@@ -57,13 +60,20 @@ const WelcomeMessage: React.FC = () => {
       animation: `${fadeInOut} 2s `,
       animationTimingFunction: 'ease',
       animationIterationCount: 'infinite',
+      margin: 0,
+    }),
+    slogan: css({
+      width: '30rem',
+      '@media screen and (max-width: 800px)': {
+        width: '80%',
+      },
     }),
   }), [hasViewed]);
 
   return (
     <>
       <div className={cx([styles.wrapper])}>
-        <img src={star} alt="star" width={30} height={30} />
+        <img src={slogan} alt="star" className={styles.slogan} />
         <p className={styles.text}>
           지난 1년간 코로나바이러스 유행이 더 심화됨에 따라, 동아리 활동에도 큰 차질이 있었습니다.
           <br />

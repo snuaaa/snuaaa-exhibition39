@@ -436,8 +436,10 @@ class AaaThree {
             object.add(word);
             word.visible = false;
 
+            const ballSize = document.body.clientWidth > 800 ? 0.05 : 0.1;
+
             const ball = makeBreathingBall(
-              0.05,
+              ballSize,
               new THREE.Vector3(child.position.x, child.position.y, child.position.z),
             );
             object.add(ball);
