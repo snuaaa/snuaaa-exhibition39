@@ -10,8 +10,8 @@ export enum SCENE {
 
 const sceneState = atom({
   key: 'sceneState',
-  // default: SCENE.INTRO,
-  default: SCENE.HOME,
+  default: SCENE.INTRO,
+  // default: SCENE.HOME,
 });
 
 export { sceneState };

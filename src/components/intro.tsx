@@ -31,10 +31,10 @@ const animation = {
   }),
   smaller: keyframes({
     from: {
-      width: '15rem',
+      transform: 'scale(1)',
     },
     to: {
-      width: '5rem',
+      transform: 'scale(0.3)',
     },
   }),
 };
@@ -56,14 +56,30 @@ const styles = {
   frame: css({
     width: '40rem',
     margin: '2rem 0',
+    '@media screen and (max-width: 800px)': {
+      width: '20rem',
+    },
+    '@media screen and (max-width: 600px)': {
+      width: '15rem',
+    },
   }),
   characterWrapper: css({
     width: '15rem',
     position: 'relative',
     height: '20rem',
+    marginBottom: '-20rem',
     animation: `${animation.smaller} 2s`,
     animationDelay: '5.5s',
     animationFillMode: 'both',
+    '@media screen and (max-width: 800px)': {
+      width: '12rem',
+    },
+    '@media screen and (max-width: 600px)': {
+      width: '10rem',
+    },
+    '@media screen and (max-height: 800px)': {
+      marginBottom: '-10rem',
+    },
   }),
   character: css({
     position: 'absolute',
@@ -80,7 +96,8 @@ const styles = {
   spotlight: css({
     position: 'absolute',
     bottom: '0',
-    left: '-7.5rem',
+    left: '-50%',
+    width: '200%',
     animation: `${animation.fadeInOut} 4s`,
     animationDelay: '2s',
     animationFillMode: 'both',
@@ -103,6 +120,12 @@ const styles = {
     cursor: 'pointer',
     background: 'none',
     border: 'none',
+    '@media screen and (max-height: 800px)': {
+      bottom: '10rem',
+    },
+    '@media screen and (max-height: 600px)': {
+      bottom: '8rem',
+    },
   }),
 };
 
@@ -118,7 +141,7 @@ type Props = {
 };
 
 const Intro: React.FC<Props> = ({ skip }) => {
-  const [index, setIndex] = useState<number>(0);
+  const [index, setIndex] = useState<number>(4);
 
   useEffect(() => {
     let timeout: number = 0;

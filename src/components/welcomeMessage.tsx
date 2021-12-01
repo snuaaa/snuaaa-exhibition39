@@ -34,6 +34,10 @@ const WelcomeMessage: React.FC = () => {
       marginTop: '2rem',
       marginBottom: '4rem',
       animation: `${fadeIn} 1s`,
+      '@media screen and (max-width: 800px)': {
+        width: '90%',
+        fontSize: '0.9rem',
+      },
     }),
     button: css({
       border: '2px solid #FFFFFF',
