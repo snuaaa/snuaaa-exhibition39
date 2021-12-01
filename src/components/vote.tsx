@@ -138,6 +138,12 @@ const styles = {
       color: '#c874f2',
       borderColor: '#c874f2',
     },
+    '&:disabled': {
+      cursor: 'not-allowed',
+      color: '#AAAAAA',
+      borderColor: '#AAAAAA',
+      // backgroundColor: 'rgb(110, 110, 110, 0.5)',
+    },
   }),
 };
 
@@ -145,6 +151,7 @@ const Vote: React.FC = () => {
   const photoList = useRecoilValue(photo);
   const memberCheckerId = 'memberChecker';
   const [selectedPhoto, setSelectedPhoto] = useState<number | null>(null);
+  const [isAuthChecking, setIsAuthChecking] = useState<boolean>(false);
   const [memberChecker, setMemberChecker] = useState<boolean>(false);
   const [password, setPassword] = useState<string>('');
   const { auth, setAuth, authMember } = useAuth();
@@ -185,7 +192,8 @@ const Vote: React.FC = () => {
   const isMemberChecking = useMemo(() => !auth.isMember && memberChecker, [memberChecker, auth]);
 
   useEffect(() => {
-    if (getToken()) {
+    if (getToken() && !auth.isLogined && !isAuthChecking) {
+      setIsAuthChecking(true);
       AuthService.getInfo()
         .then(({ isMember, hasVoted }) => {
           setAuth({
@@ -196,9 +204,12 @@ const Vote: React.FC = () => {
         })
         .catch((err) => {
           console.error(err);
+        })
+        .finally(() => {
+          setIsAuthChecking(false);
         });
     }
-  }, [setAuth, getToken]);
+  }, [setAuth, getToken, auth, isAuthChecking, setIsAuthChecking]);
 
   return (
     <>
@@ -258,7 +269,7 @@ const Vote: React.FC = () => {
                     나는 AAA회원입니다.
                   </label>
                 </div>
-                <button type="button" className={styles.submitButton} onClick={submit}>
+                <button type="button" className={styles.submitButton} onClick={submit} disabled={!selectedPhoto}>
                   투표하기
                 </button>
               </>
