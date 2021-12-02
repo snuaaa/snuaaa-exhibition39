@@ -1,6 +1,8 @@
-import React, { useMemo } from 'react';
+import React, {
+  useEffect, useMemo, useRef, useState,
+} from 'react';
 import { css, cx } from '@emotion/css';
-import { fadeIn, fadeInOut } from 'src/styles/animation';
+import { fadeInOut } from 'src/styles/animation';
 import useWelcome from 'src/hooks/useWelcome';
 import useReady from 'src/hooks/useReady';
 import slogan from 'src/assets/images/slogan.png';
@@ -9,6 +11,16 @@ import background from 'src/assets/images/background_star.png';
 const WelcomeMessage: React.FC = () => {
   const { hasViewed, setHasViewed } = useWelcome();
   const { ready } = useReady();
+  const imgRef = useRef<HTMLImageElement>(null);
+  const [isImageLoaded, setIsImageLoaded] = useState(false);
+
+  useEffect(() => {
+    if (imgRef.current) {
+      imgRef.current.onload = () => {
+        setIsImageLoaded(true);
+      };
+    }
+  }, []);
 
   const styles = useMemo(() => ({
     wrapper: css({
@@ -18,15 +30,11 @@ const WelcomeMessage: React.FC = () => {
       width: '100%',
       backgroundImage: `url(${background})`,
       background: 'linear-gradient(180deg, #0C0D2D 0%, #091241 11.46%, #1A2273 45.83%, #55277A 71.87%, #A04DA6 100%);',
-      opacity: '0.4',
       display: !hasViewed ? 'flex' : 'none',
       flexDirection: 'column',
       justifyContent: 'center',
       alignItems: 'center',
       zIndex: 10,
-      animation: `${fadeIn} 1s`,
-      animationDelay: '0.5s',
-      animationFillMode: 'both',
       cursor: 'default',
     }),
     text: css({
@@ -37,7 +45,9 @@ const WelcomeMessage: React.FC = () => {
       lineHeight: 1.5,
       marginTop: '2rem',
       marginBottom: '4rem',
-      animation: `${fadeIn} 1s`,
+      // animation: `${fadeIn} 1s`,
+      opacity: isImageLoaded ? 1 : 0,
+      transition: 'all ease 0.5s',
       '@media screen and (max-width: 800px)': {
         width: '80%',
         fontSize: '0.9rem',
@@ -51,8 +61,9 @@ const WelcomeMessage: React.FC = () => {
       fontFamily: 'IM_Hyemin-Regular',
       background: 'transparent',
       cursor: 'pointer',
-      transition: 'all ease 0.3s',
+      transition: 'all ease 0.5s',
       zIndex: 1,
+      opacity: isImageLoaded ? 1 : 0,
       '&:hover': {
         color: '#c874f2',
         borderColor: '#c874f2',
@@ -63,9 +74,13 @@ const WelcomeMessage: React.FC = () => {
       animationTimingFunction: 'ease',
       animationIterationCount: 'infinite',
       margin: 0,
+      opacity: isImageLoaded ? 1 : 0,
+      transition: 'all ease 0.5s',
     }),
     slogan: css({
       width: '30rem',
+      opacity: isImageLoaded ? 1 : 0,
+      transition: 'all ease 0.5s',
       '@media screen and (max-width: 800px)': {
         width: '80%',
       },
@@ -77,12 +92,12 @@ const WelcomeMessage: React.FC = () => {
       height: '100%',
       width: '100%',
     }),
-  }), [hasViewed]);
+  }), [hasViewed, isImageLoaded]);
 
   return (
     <>
       <div className={cx([styles.wrapper])}>
-        <img className={styles.background} src={background} alt="background" />
+        <img ref={imgRef} className={styles.background} src={background} alt="background" />
         <img src={slogan} alt="star" className={styles.slogan} />
         <p className={styles.text}>
           지난 1년간 코로나바이러스 유행이 더 심화됨에 따라, 동아리 활동에도 큰 차질이 있었습니다.
