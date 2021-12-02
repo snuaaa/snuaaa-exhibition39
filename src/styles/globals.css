@@ -18,6 +18,7 @@ a {
   box-sizing: border-box;
   user-select: none;
   font-family: IM_Hyemin-Regular;
+  -webkit-tap-highlight-color: transparent;
 }
 
 #root {
@@ -28,6 +29,7 @@ button {
   border: none;
   cursor: pointer;
 }
+
 
 @font-face {
   font-family: 'FOUREYES';

@@ -16,6 +16,7 @@ const styles = {
     position: 'absolute',
     top: '2rem',
     left: '2rem',
+    zIndex: 20,
   }),
   button: css({
     background: 'none',
@@ -43,7 +44,7 @@ const Music: React.FC = () => {
           homeBgmRef.current.pause();
           roomBgmRef.current.volume = 1;
           roomBgmRef.current.play();
-        } else {
+        } else if (scene !== SCENE.INTRO) {
           roomBgmRef.current.pause();
           homeBgmRef.current.volume = 1;
           homeBgmRef.current.play();

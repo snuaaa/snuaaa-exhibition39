@@ -17,7 +17,7 @@ const WelcomeMessage: React.FC = () => {
       height: '100%',
       width: '100%',
       backgroundImage: `url(${background})`,
-      backgroundColor: 'rgba(0, 0, 0, 0.7)',
+      background: 'linear-gradient(180deg, #0C0D2D 0%, #091241 11.46%, #1A2273 45.83%, #55277A 71.87%, #A04DA6 100%);',
       opacity: '0.4',
       display: !hasViewed ? 'flex' : 'none',
       flexDirection: 'column',
@@ -27,6 +27,7 @@ const WelcomeMessage: React.FC = () => {
       animation: `${fadeIn} 1s`,
       animationDelay: '0.5s',
       animationFillMode: 'both',
+      cursor: 'default',
     }),
     text: css({
       width: '50%',
@@ -51,6 +52,7 @@ const WelcomeMessage: React.FC = () => {
       background: 'transparent',
       cursor: 'pointer',
       transition: 'all ease 0.3s',
+      zIndex: 1,
       '&:hover': {
         color: '#c874f2',
         borderColor: '#c874f2',
@@ -68,11 +70,19 @@ const WelcomeMessage: React.FC = () => {
         width: '80%',
       },
     }),
+    background: css({
+      position: 'absolute',
+      top: 0,
+      left: 0,
+      height: '100%',
+      width: '100%',
+    }),
   }), [hasViewed]);
 
   return (
     <>
       <div className={cx([styles.wrapper])}>
+        <img className={styles.background} src={background} alt="background" />
         <img src={slogan} alt="star" className={styles.slogan} />
         <p className={styles.text}>
           지난 1년간 코로나바이러스 유행이 더 심화됨에 따라, 동아리 활동에도 큰 차질이 있었습니다.
