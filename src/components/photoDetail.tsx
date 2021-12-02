@@ -78,6 +78,7 @@ const PhotoDetail: React.FC<Props> = ({ modelName }) => {
       '@media screen and (max-width: 800px)': {
         width: '100%',
         overflow: 'auto',
+        justifyContent: 'flex-start',
       },
     }),
     icon: css({
