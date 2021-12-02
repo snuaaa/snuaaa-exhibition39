@@ -28,7 +28,7 @@ const styles = {
 };
 
 const Music: React.FC = () => {
-  const [isMute, setIsMute] = useState(false);
+  const [isMute, setIsMute] = useState(true);
   const { scene } = useScene();
   const homeBgmRef = useRef<HTMLAudioElement>(null);
   const roomBgmRef = useRef<HTMLAudioElement>(null);
@@ -44,7 +44,7 @@ const Music: React.FC = () => {
           homeBgmRef.current.pause();
           roomBgmRef.current.volume = 1;
           roomBgmRef.current.play();
-        } else if (scene !== SCENE.INTRO) {
+        } else {
           roomBgmRef.current.pause();
           homeBgmRef.current.volume = 1;
           homeBgmRef.current.play();
