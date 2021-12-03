@@ -116,7 +116,7 @@ const Login: React.FC = () => {
           <br />
           수집된 개인정보는 사진전 전시와 이벤트가 모두 종료되는 2021.12.14 이후로부터 30일 이내에 파기됩니다.
         </p>
-        <div id="loginButton" className={styles.loginButton}>Login</div>
+        <div id="loginButton" className={styles.loginButton}>앱이 아닌 다른 브라우저를 사용해 주세요.</div>
         <button type="button" className={styles.cancelButton} onClick={() => setScene(SCENE.HOME)}>뒤로가기</button>
       </div>
     </>
