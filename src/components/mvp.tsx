@@ -14,7 +14,7 @@ import Vote from './vote';
 const messages = [
   '안녕하세요? 이곳은 MVP Zone입니다.',
   'MVP Zone은 투표를 통해 최고의 사진을 뽑는 곳이에요.',
-  '당신의 마음을 가장 크게 울린 사진 한 장은 무엇이엇나요?',
+  '당신의 마음을 가장 크게 울린 사진 한 장은 무엇이었나요?',
 ];
 
 const styles = {

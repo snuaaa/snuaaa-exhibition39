@@ -205,6 +205,18 @@ const NewbieProject: React.FC = () => {
               For the STARved & STARving the stars.
               별고픈 이들이여, 별을 보아라.
             </p>
+            <br />
+            <p className={styles.text}>
+              참여한 사람
+              <br />
+              신입생 프로젝트 짱: 이상혁, 최승원
+              <br />
+              별자리 담당: 강준호, 김동욱, 김민재, 박소현, 송영서, 우경준, 유찬우, 윤영빈, 이준영, 이해찬, 천제현, 최선호
+              <br />
+              해시계 담당: 고계훈, 김동화, 문준성, 최다연
+              <br />
+              소개글 작성 및 정리: 성현규
+            </p>
           </div>
         </div>
       </div>
