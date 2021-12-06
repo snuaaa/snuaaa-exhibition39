@@ -90,8 +90,6 @@ class AaaThree {
 
   private room?: THREE.Object3D;
 
-  private floor?: THREE.Object3D;
-
   private towerBackground?: THREE.CubeTexture;
 
   private roomBackground?: THREE.CubeTexture;
@@ -124,6 +122,7 @@ class AaaThree {
     this.loadPromise
       .then(() => {
         this.tower = this.makeTower();
+        this.room = this.makeRoom();
 
         this.scene.add(this.camera);
         this.scene.add(...makeLights());
@@ -175,11 +174,11 @@ class AaaThree {
         if (this.tower) {
           this.scene.add(this.tower);
         }
+        if (this.towerBackground) {
+          this.scene.background = this.towerBackground;
+        }
       });
       // this.scene.background = new THREE.Color('#101545');
-      if (this.towerBackground) {
-        this.scene.background = this.towerBackground;
-      }
       this.scene.fog = new THREE.Fog(0x090f27, 15, 25);
 
       this.shootingStarInterval = window.setInterval(() => {
@@ -198,17 +197,14 @@ class AaaThree {
       if (this.tower) {
         this.scene.remove(this.tower);
       }
-      if (this.floor) {
-        this.scene.remove(this.floor);
+      if (this.room) {
+        this.scene.add(this.room);
       }
       if (this.roomBackground) {
         this.scene.background = this.roomBackground;
       }
 
-      this.room = this.makeRoom();
-      this.scene.add(this.room);
       this.scene.fog = null;
-      (window as any).camera = this.camera;
 
       this.camera.position.set(POSITION_HOME.x, POSITION_HOME.y, POSITION_HOME.z);
       this.camera.rotation.set(0, 0, 0);
