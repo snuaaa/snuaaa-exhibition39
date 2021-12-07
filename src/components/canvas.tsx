@@ -163,6 +163,7 @@ const Canvas: React.FC = () => {
               onMouseUp={() => setMoveLeft(false)}
               onMouseOut={() => setMoveLeft(false)}
               onBlur={() => setMoveLeft(false)}
+              onContextMenu={(e) => e.preventDefault()}
             >
               <img src={leftIcon} alt="leftIcon" className={styles.icon} onContextMenu={(e) => e.preventDefault()} />
             </button>
@@ -175,6 +176,7 @@ const Canvas: React.FC = () => {
               onMouseUp={() => setMoveRight(false)}
               onMouseOut={() => setMoveRight(false)}
               onBlur={() => setMoveRight(false)}
+              onContextMenu={(e) => e.preventDefault()}
             >
               <img src={rightIcon} alt="rightIcon" className={styles.icon} onContextMenu={(e) => e.preventDefault()} />
             </button>
@@ -187,6 +189,7 @@ const Canvas: React.FC = () => {
               onMouseUp={() => setMoveForward(false)}
               onMouseOut={() => setMoveForward(false)}
               onBlur={() => setMoveForward(false)}
+              onContextMenu={(e) => e.preventDefault()}
             >
               <img src={forwardIcon} alt="frontIcon" className={styles.icon} onContextMenu={(e) => e.preventDefault()} />
             </button>
@@ -199,6 +202,7 @@ const Canvas: React.FC = () => {
               onMouseUp={() => setMoveBackward(false)}
               onMouseOut={() => setMoveBackward(false)}
               onBlur={() => setMoveBackward(false)}
+              onContextMenu={(e) => e.preventDefault()}
             >
               <img src={backwardIcon} alt="backIcon" className={styles.icon} onContextMenu={(e) => e.preventDefault()} />
             </button>
