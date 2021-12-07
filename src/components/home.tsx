@@ -8,7 +8,9 @@ import useWelcome from 'src/hooks/useWelcome';
 import guestbookIcon from 'src/assets/icons/guestbook.svg';
 import voteIcon from 'src/assets/icons/vote.svg';
 import { SCENE } from 'src/recoils/scene';
+import useTooltip from 'src/hooks/useTooltip';
 import WelcomeMessage from './welcomeMessage';
+import TooltipHome from './tooltipHome';
 
 const styles = {
   slogan: css({
@@ -47,6 +49,7 @@ const Home: React.FC = () => {
   const { scene, setScene } = useScene();
   const aaaThree = useRef<AaaThree>();
   const { hasViewed } = useWelcome();
+  const { tooltip } = useTooltip();
 
   useEffect(() => {
     if (aaaThree.current) {
@@ -73,6 +76,9 @@ const Home: React.FC = () => {
           <img src={voteIcon} alt="voteIcon" className={styles.icon} />
         </button>
       </div>
+      {
+        tooltip.home && <TooltipHome />
+      }
       {
         !hasViewed && <WelcomeMessage />
       }

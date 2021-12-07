@@ -5,7 +5,9 @@ import { SCENE } from 'src/recoils/scene';
 import homeIcon from 'src/assets/icons/home.png';
 import useScene from 'src/hooks/useScene';
 import useSelectedPhoto from 'src/hooks/useSelectedPhoto';
+import useTooltip from 'src/hooks/useTooltip';
 import PhotoDetail from './photoDetail';
+import TooltipGallery from './tooltipGallery';
 
 const styles = {
   homeButton: css({
@@ -17,6 +19,10 @@ const styles = {
     background: 'none',
     border: 'none',
   }),
+  icon: css({
+    height: '3rem',
+    width: '3rem',
+  }),
 };
 
 const Gallery: React.FC = () => {
@@ -25,6 +31,7 @@ const Gallery: React.FC = () => {
   const onClickHome = useCallback(() => {
     setScene(SCENE.HOME);
   }, [setScene]);
+  const { tooltip } = useTooltip();
 
   return (
     <>
@@ -37,8 +44,11 @@ const Gallery: React.FC = () => {
         )
       }
       <button type="button" className={styles.homeButton} onClick={onClickHome}>
-        <img src={homeIcon} alt="homeIcon" />
+        <img src={homeIcon} alt="homeIcon" className={styles.icon} />
       </button>
+      {
+        tooltip.gallery && <TooltipGallery />
+      }
     </>
   );
 };
