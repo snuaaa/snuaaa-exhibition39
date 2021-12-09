@@ -19,8 +19,11 @@ const styles = {
     width: '50%',
     height: '90%',
     background: 'none',
-    padding: '2rem 1rem',
+    padding: '0rem 1rem',
     color: '#FFFFFF',
+    display: 'flex',
+    justifyContent: 'center',
+    flexDirection: 'column',
     '@media screen and (max-width: 1200px)': {
       width: '70%',
     },
@@ -34,6 +37,7 @@ const styles = {
     height: '50%',
     width: '100%',
     display: 'flex',
+    flexGrow: 1,
     flexDirection: 'column-reverse',
     padding: `${gradientSize} 0`,
     maskImage: `linear-gradient(to bottom, transparent, #000000 ${gradientSize}, #000000 calc(100% - ${gradientSize}), transparent 100% ), linear-gradient(#000000, #000000)`,
@@ -66,7 +70,8 @@ const styles = {
     lineHeight: 1.4,
   }),
   titleImg: css({
-    width: '100%',
+    maxWidth: '100%',
+    maxHeight: '15rem',
   }),
   inputWrapper: css({
     width: '100%',
