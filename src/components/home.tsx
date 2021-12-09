@@ -1,4 +1,6 @@
-import React, { useCallback, useEffect, useRef } from 'react';
+import React, {
+  useCallback, useEffect, useRef, useState,
+} from 'react';
 import { css } from '@emotion/css';
 
 import AaaThree from 'src/three/aaaThree';
@@ -7,10 +9,12 @@ import useScene from 'src/hooks/useScene';
 import useWelcome from 'src/hooks/useWelcome';
 import guestbookIcon from 'src/assets/icons/guestbook.svg';
 import voteIcon from 'src/assets/icons/vote.svg';
+import eventIcon from 'src/assets/icons/event.svg';
 import { SCENE } from 'src/recoils/scene';
 import useTooltip from 'src/hooks/useTooltip';
 import WelcomeMessage from './welcomeMessage';
 import TooltipHome from './tooltipHome';
+import Event from './event';
 
 const styles = {
   slogan: css({
@@ -38,7 +42,7 @@ const styles = {
     background: 'none',
   }),
   icon: css({
-    width: '3rem',
+    height: '3rem',
   }),
   canvas: css({
     userSelect: 'none',
@@ -50,6 +54,7 @@ const Home: React.FC = () => {
   const aaaThree = useRef<AaaThree>();
   const { hasViewed } = useWelcome();
   const { tooltip } = useTooltip();
+  const [viewEvent, setViewEvent] = useState(false);
 
   useEffect(() => {
     if (aaaThree.current) {
@@ -65,6 +70,14 @@ const Home: React.FC = () => {
     setScene(SCENE.MVP);
   }, [setScene]);
 
+  const openEvent = useCallback(() => {
+    setViewEvent(true);
+  }, [setViewEvent]);
+
+  const closeEvent = useCallback(() => {
+    setViewEvent(false);
+  }, [setViewEvent]);
+
   return (
     <>
       <img className={styles.slogan} src={slogan} alt="for the STARved" />
@@ -75,7 +88,13 @@ const Home: React.FC = () => {
         <button type="button" className={styles.button} onClick={onClickMVP}>
           <img src={voteIcon} alt="voteIcon" className={styles.icon} />
         </button>
+        <button type="button" className={styles.button} onClick={openEvent}>
+          <img src={eventIcon} alt="eventIcon" className={styles.icon} />
+        </button>
       </div>
+      {
+        viewEvent && <Event close={closeEvent} />
+      }
       {
         tooltip.home && <TooltipHome />
       }

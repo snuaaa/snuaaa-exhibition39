@@ -62,8 +62,10 @@ const styles = {
     display: 'block',
   }),
   title: css({
-    fontSize: '1.5rem',
+    fontSize: '2rem',
     color: '#FFD45F',
+    fontFamily: 'FOUREYES',
+    fontWeight: 400,
   }),
   contentWrapper: css({
     display: 'flex',
