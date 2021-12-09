@@ -40,7 +40,7 @@ const TooltipHome: React.FC = () => {
     }),
     iconTooltip: css({
       position: 'absolute',
-      right: '2rem',
+      right: '1rem',
       bottom: '5rem',
       display: 'flex',
     }),
@@ -50,7 +50,7 @@ const TooltipHome: React.FC = () => {
       margin: 0,
     }),
     iconText: css({
-      width: '3rem',
+      width: '3.5rem',
       textAlign: 'center',
     }),
   }), []);
@@ -83,7 +83,7 @@ const TooltipHome: React.FC = () => {
         <div className={styles.iconTooltip}>
           <p className={cx([styles.text, styles.iconText])}>방명록</p>
           <p className={cx([styles.text, styles.iconText])}>MVP</p>
-          {/* <p className={cx([styles.text, styles.iconText])}>이벤트</p> */}
+          <p className={cx([styles.text, styles.iconText])}>이벤트</p>
         </div>
       </div>
     </>

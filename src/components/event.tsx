@@ -4,6 +4,7 @@ import React, { useEffect } from 'react';
 import { css, cx } from '@emotion/css';
 import instagramIcon from 'src/assets/icons/instagram.svg';
 import goodsIcon from 'src/assets/icons/goods.svg';
+import cancelIcon from 'src/assets/icons/cancel.svg';
 
 const styles = {
   wrapper: css({
@@ -73,6 +74,13 @@ const styles = {
       fontSize: '0.9rem',
     },
   }),
+  cancelButton: css({
+    background: 'none',
+  }),
+  cancelIcon: css({
+    height: '1.5rem',
+    width: '1.5rem',
+  }),
   instagramIconLink: css({
     display: 'flex',
   }),
@@ -122,6 +130,9 @@ const Event: React.FC<Props> = ({ close }) => {
             <img src={instagramIcon} alt="instagramIcon" className={styles.instagramIcon} />
           </a>
         </div>
+        <button type="button" onClick={close} className={styles.cancelButton}>
+          <img src={cancelIcon} alt="cancelIcon" className={styles.cancelIcon} />
+        </button>
       </div>
     </>
   );
