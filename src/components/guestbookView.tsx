@@ -97,6 +97,7 @@ const styles = {
     width: '100%',
     marginTop: '0.3rem',
     padding: '0.2rem',
+    userSelect: 'auto',
     '&:focus-visible': {
       outline: 'none',
       backgroundColor: 'rgba(73, 81, 138, 0.4)',
@@ -109,6 +110,7 @@ const styles = {
     background: 'none',
     flexGrow: 1,
     margin: '1rem 2rem 1rem 0',
+    userSelect: 'auto',
     '&:focus-visible': {
       outline: 'none',
       backgroundColor: 'rgba(73, 81, 138, 0.4)',
