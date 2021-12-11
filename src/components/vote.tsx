@@ -112,6 +112,7 @@ const styles = {
     border: 'none',
     borderBottom: '2px solid #FFFFFF',
     color: '#FFFFFF',
+    userSelect: 'auto',
     '&:focus-visible': {
       outline: 'none',
       borderColor: '#c874f2',
