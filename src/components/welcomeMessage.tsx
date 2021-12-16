@@ -12,7 +12,7 @@ const WelcomeMessage: React.FC = () => {
   const { hasViewed, setHasViewed } = useWelcome();
   const { ready } = useReady();
   const imgRef = useRef<HTMLImageElement>(null);
-  const [isImageLoaded, setIsImageLoaded] = useState(false);
+  const [isImageLoaded, setIsImageLoaded] = useState(true);
 
   useEffect(() => {
     if (imgRef.current) {
