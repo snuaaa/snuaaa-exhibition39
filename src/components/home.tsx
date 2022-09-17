@@ -88,9 +88,9 @@ const Home: React.FC = () => {
         <button type="button" className={styles.button} onClick={onClickMVP}>
           <img src={voteIcon} alt="voteIcon" className={styles.icon} />
         </button>
-        <button type="button" className={styles.button} onClick={openEvent}>
+        {/* <button type="button" className={styles.button} onClick={openEvent}>
           <img src={eventIcon} alt="eventIcon" className={styles.icon} />
-        </button>
+        </button> */}
       </div>
       {
         viewEvent && <Event close={closeEvent} />

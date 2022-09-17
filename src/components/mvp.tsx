@@ -78,8 +78,10 @@ const styles = {
 const MVP: React.FC = () => {
   const [index, setIndex] = useState<number>(0);
   const { isLogin } = useToken();
-  const { auth: { hasVoted } } = useAuth();
+  // const { auth: { hasVoted } } = useAuth();
   const { setScene } = useScene();
+
+  const hasVoted = true;
 
   useEffect(() => {
     const interval = window.setInterval(() => {
@@ -103,7 +105,7 @@ const MVP: React.FC = () => {
       return (
         <div className={styles.textWrapper}>
           <p className={styles.text}>
-            MVP 투표에 참여해주셔서 감사합니다!
+            MVP 투표가 종료되었습니다.
           </p>
           <button type="button" className={styles.button} onClick={onClickButton}>홈으로</button>
         </div>

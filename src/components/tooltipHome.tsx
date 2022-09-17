@@ -83,7 +83,7 @@ const TooltipHome: React.FC = () => {
         <div className={styles.iconTooltip}>
           <p className={cx([styles.text, styles.iconText])}>방명록</p>
           <p className={cx([styles.text, styles.iconText])}>MVP</p>
-          <p className={cx([styles.text, styles.iconText])}>이벤트</p>
+          {/* <p className={cx([styles.text, styles.iconText])}>이벤트</p> */}
         </div>
       </div>
     </>

@@ -226,16 +226,6 @@ const GuestbookView: React.FC = () => {
         <div className={styles.guestbookList}>
           {guestbookListView}
         </div>
-        <div className={styles.inputWrapper}>
-          <div className={styles.nicknameWrapper}>
-            <label htmlFor="nickname">
-              닉네임
-              <input type="text" id="nickname" className={styles.input} onChange={onNicknameChnage} value={nickname} autoComplete="off" />
-            </label>
-          </div>
-          <textarea className={styles.textarea} onChange={onTextChange} value={text} />
-          <button type="submit" className={styles.submitButton} onClick={submit} disabled={!canSubmit}>ENTER</button>
-        </div>
         <button type="button" onClick={() => setScene(SCENE.HOME)} className={styles.cancelButton}>
           <img src={cancelIcon} alt="cancelIcon" className={styles.cancelIcon} />
         </button>

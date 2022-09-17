@@ -4,7 +4,7 @@ import GuestBook from '../types/guestbook';
 const GuestbookService = {
 
   retrieve(page: number = 1) {
-    return BaseService.get<GuestBook[]>('guestbook');
+    return BaseService.get<GuestBook[]>('/data/guestbook.json');
   },
 
   create(text: string, nickname?: string) {

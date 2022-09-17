@@ -2,7 +2,7 @@ import { useCallback, useEffect } from 'react';
 import { useRecoilState } from 'recoil';
 import axios from 'axios';
 import tokenAtom from 'src/recoils/tokenAtom';
-import AuthService from 'src/services/authService';
+// import AuthService from 'src/services/authService';
 
 const useToken = () => {
   const [tokenValue, setTokenValue] = useRecoilState(tokenAtom);
@@ -20,18 +20,18 @@ const useToken = () => {
     setTokenValue(null);
   }, [setTokenValue]);
 
-  useEffect(() => {
-    const localToken = window.localStorage.getItem('token');
-    if (localToken) {
-      AuthService.checkToken()
-        .then(() => {
-        })
-        .catch(() => {
-          removeToken();
-        });
-    }
-    setTokenValue(localToken);
-  }, [setTokenValue, removeToken]);
+  // useEffect(() => {
+  //   const localToken = window.localStorage.getItem('token');
+  //   if (localToken) {
+  //     AuthService.checkToken()
+  //       .then(() => {
+  //       })
+  //       .catch(() => {
+  //         removeToken();
+  //       });
+  //   }
+  //   setTokenValue(localToken);
+  // }, [setTokenValue, removeToken]);
 
   const isLogin: boolean = !!tokenValue;
 

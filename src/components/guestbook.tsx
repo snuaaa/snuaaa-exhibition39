@@ -30,7 +30,8 @@ const styles = {
 };
 
 const Guestbook: React.FC = () => {
-  const { isLogin } = useToken();
+  // const { isLogin } = useToken();
+  const isLogin = true;
 
   return (
     <>

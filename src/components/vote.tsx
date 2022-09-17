@@ -14,7 +14,7 @@ import useAuth from 'src/hooks/useAuth';
 import useToken from 'src/hooks/useToken';
 import useScene from 'src/hooks/useScene';
 import PhotoService from 'src/services/photoService';
-import AuthService from 'src/services/authService';
+// import AuthService from 'src/services/authService';
 import { SCENE } from 'src/recoils/scene';
 
 const gradientSize = '3rem';
@@ -214,25 +214,25 @@ const Vote: React.FC = () => {
 
   const isMemberChecking = useMemo(() => !auth.isMember && memberChecker, [memberChecker, auth]);
 
-  useEffect(() => {
-    if (getToken() && !auth.isLogined && !isAuthChecking) {
-      setIsAuthChecking(true);
-      AuthService.getInfo()
-        .then(({ isMember, hasVoted }) => {
-          setAuth({
-            isLogined: true,
-            isMember,
-            hasVoted,
-          });
-        })
-        .catch((err) => {
-          console.error(err);
-        })
-        .finally(() => {
-          setIsAuthChecking(false);
-        });
-    }
-  }, [setAuth, getToken, auth, isAuthChecking, setIsAuthChecking]);
+  // useEffect(() => {
+  //   if (getToken() && !auth.isLogined && !isAuthChecking) {
+  //     setIsAuthChecking(true);
+  //     AuthService.getInfo()
+  //       .then(({ isMember, hasVoted }) => {
+  //         setAuth({
+  //           isLogined: true,
+  //           isMember,
+  //           hasVoted,
+  //         });
+  //       })
+  //       .catch((err) => {
+  //         console.error(err);
+  //       })
+  //       .finally(() => {
+  //         setIsAuthChecking(false);
+  //       });
+  //   }
+  // }, [setAuth, getToken, auth, isAuthChecking, setIsAuthChecking]);
 
   return (
     <>

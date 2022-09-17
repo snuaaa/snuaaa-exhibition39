@@ -8,7 +8,7 @@ const PhotoService = {
   },
 
   retrieveAll() {
-    return BaseService.get<Photo[]>('photo');
+    return BaseService.get<Photo[]>('/data/photo.json');
   },
 
   vote(photo_id: number) {

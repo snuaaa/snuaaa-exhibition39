@@ -3,7 +3,7 @@ import { css } from '@emotion/css';
 import { fadeIn } from 'src/styles/animation';
 import photoSelector from 'src/recoils/photoSelector';
 import { useRecoilValue } from 'recoil';
-import { SERVER_URL } from 'src/config';
+import { APP_URL } from 'src/config';
 import userIcon from 'src/assets/icons/user.svg';
 import dateIcon from 'src/assets/icons/date.svg';
 import locationIcon from 'src/assets/icons/location.svg';
@@ -154,13 +154,13 @@ const PhotoDetail: React.FC<Props> = ({ modelName }) => {
                     <video
                       className={styles.img}
                       autoPlay
-                      src={`${SERVER_URL}/static/${photoInfo.file_path}`}
+                      src={`${APP_URL}/photo/${photoInfo.file_path}`}
                     />
                   )
                   : (
                     <img
                       className={styles.img}
-                      src={`${SERVER_URL}/static/${photoInfo.file_path}`}
+                      src={`${APP_URL}/photo/${photoInfo.file_path}`}
                       alt={photoInfo.model_name}
                     />
                   )
